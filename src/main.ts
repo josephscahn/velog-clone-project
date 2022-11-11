@@ -1,10 +1,10 @@
+require('dotenv').config();
+
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from 'config/config.service';
 import * as fs from 'fs';
-
-require('dotenv').config();
 
 async function bootstrap() {
   await makeOrmConfig();
@@ -15,8 +15,8 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
-      transform: true
-    })
+      transform: true,
+    }),
   );
 
   await app.listen(process.env.SERVER_POST);
@@ -30,10 +30,7 @@ async function makeOrmConfig() {
     fs.unlinkSync('ormconfig.json');
   }
 
-  fs.writeFileSync(
-    'ormconfig.json',
-    JSON.stringify(typeormConfig, null, 2)
-  );
+  fs.writeFileSync('ormconfig.json', JSON.stringify(typeormConfig, null, 2));
 }
 
 bootstrap();

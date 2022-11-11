@@ -8,4 +8,8 @@ export class UserService {
   constructor(private readonly connection: Connection) {
     this.userRepository = this.connection.getCustomRepository(UserRepository);
   }
+
+  async findOne(login_id: string) {
+    return this.userRepository.findByLogin(login_id);
+  }
 }
