@@ -1,10 +1,10 @@
+import { Logger } from '@nestjs/common';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 require('dotenv').config();
 
 export class ConfigService {
-
-  constructor(private env: { [k: string]: string | undefined }) { }
+  constructor(private env: { [k: string]: string | undefined }) {}
 
   private getValue(key: string, throwOnMissing = true): string {
     const value = this.env[key];
@@ -33,6 +33,7 @@ export class ConfigService {
       cli: {
         migrationsDir: 'src/migration',
       },
+      synchronize: true,
       // ssl: !this.isDevelopment(),
     };
   }
