@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
 import { UserRepository } from 'src/repository/user.repository';
@@ -46,9 +46,14 @@ export class AuthService {
   }
 
   async validateUser(login_id: string, password: string) {
-    const user = await this.userRepository.checkEmail(login_id);
+    const user = await this.userRepository.checkLoginId(login_id);
 
-    if (user && bcryptjs.compareSync(password, user.password)) {
+    if (!user) {
+      throw new ForbiddenException('로그인 아이디를 확인 해주세요');
+    }
+
+    if (bcryptjs.compareSync(password, user.password)) {
+
       const { password, ...result } = user;
       return result;
     }

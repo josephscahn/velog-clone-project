@@ -26,10 +26,12 @@ export class AuthController {
     const user = await this.authService.checkEmail(email);
 
     if (user) {
+      console.log('err');
       throw new ConflictException('이미 가입된 이메일입니다.');
+    } else {
+      const code = await this.authService.sendEmail(email);
+      return { message: 'Send Email', signup_code: code };
     }
-    const code = await this.authService.sendEmail(email);
-    return { message: 'Send Email', signup_code: code };
   }
 
   @Post('/signup')

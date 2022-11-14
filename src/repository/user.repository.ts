@@ -5,11 +5,14 @@ import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-  async checkEmail(login_id: string) {
+
+  async checkEmail(email: string) {
+    const user = await this.findOne({ email });
+    return user;
+  }
+
+  async checkLoginId(login_id: string) {
     const user = await this.findOne({ login_id });
-    if (!user) {
-      throw new ForbiddenException('로그인 아이디를 확인 해주세요');
-    }
     return user;
   }
 
