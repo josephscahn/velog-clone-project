@@ -4,7 +4,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Unique,
+  OneToMany
 } from 'typeorm';
+import { Board } from './board.entity';
 
 @Entity({ name: 'user' })
 @Unique(['email'])
@@ -42,4 +44,7 @@ export class User extends BaseEntity {
 
   @Column({ default: false })
   update_alert: boolean;
+
+  @OneToMany(type => Board, board => board.user)
+  boards: Board[]
 }
