@@ -62,9 +62,12 @@ export class AuthController {
       }
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') {
+        console.log(err);
         throw new ConflictException('이메일이 중복 되었습니다');
+      } else {
+        console.log(err);
+        throw new InternalServerErrorException();
       }
-      throw new InternalServerErrorException();
     }
   }
 

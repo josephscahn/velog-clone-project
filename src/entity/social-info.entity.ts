@@ -30,5 +30,5 @@ export class SocialInfo extends BaseEntity {
 
   @OneToOne(() => User)
   @JoinColumn()
-  user: User;
+  user: number;
 }
