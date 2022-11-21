@@ -3,7 +3,6 @@ import {
   HttpCode,
   Patch,
   UsePipes,
-  Request,
   ValidationPipe,
   UseGuards,
   Body,
@@ -11,9 +10,15 @@ import {
   InternalServerErrorException,
   BadRequestException,
   Query,
+  Post,
+  ParseIntPipe,
+  Delete,
+  Get,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { SocialInfoDto, UpdateUserDto } from 'src/dto/user/update-user.dto';
+import { User } from 'src/entity/user.entity';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -27,10 +32,10 @@ export class UserController {
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
     @Query('type') type: string,
-    @Request() req: Request,
+    @GetUser() user: User,
   ) {
     // type: [title, name, profile_image, social_info]
-    const { id } = req['user'];
+    const id = user.id;
     try {
       let data: any = '';
       let updateData: object = {};
@@ -108,9 +113,9 @@ export class UserController {
   @HttpCode(201)
   async udpateProfileImage(
     @Body('profile_image') profile_image: string,
-    @Request() req: Request,
+    @GetUser() user: User,
   ) {
-    const { id } = req['user'];
+    const id = user.id;
     try {
       const data = await this.userService.updateProfileImage(
         id,
@@ -128,5 +133,48 @@ export class UserController {
         throw new InternalServerErrorException();
       }
     }
+  }
+
+  /**
+   * 1번 유저가 2번 유저를 팔로우 했다 => 1번 유저: follower, 2번 유저: followee
+   * @param user
+   * @param followeeId
+   * @returns
+   */
+  @Post('/follow')
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(201)
+  async follow(
+    @GetUser() user: User,
+    @Body('followee_id', ParseIntPipe) followeeId: number,
+  ) {
+    const followerId = user.id;
+    await this.userService.follow(followerId, followeeId);
+    return { message: `follow success` };
+  }
+
+  @Delete('/follow')
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
+  async unfollow(
+    @GetUser() user: User,
+    @Body('followee_id', ParseIntPipe) followeeId: number,
+  ) {
+    const followerId = user.id;
+    await this.userService.unfollow(followerId, followeeId);
+    return { message: `unfollow success` };
+  }
+
+  @Get('/follow')
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  async getMyFollowee(@GetUser() user: User) {
+    const id = user.id;
+    let follow = await this.userService.getMyFollowee(id);
+    follow = follow[0];
+    return { follow };
   }
 }
