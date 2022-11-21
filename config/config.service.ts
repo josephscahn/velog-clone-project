@@ -34,6 +34,7 @@ export class ConfigService {
         migrationsDir: 'src/migration',
       },
       synchronize: true,
+      logging: true,
       // ssl: !this.isDevelopment(),
     };
   }
