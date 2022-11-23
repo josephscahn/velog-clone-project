@@ -6,6 +6,7 @@ import { CommentService } from './comment.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([CommentRepository])],
+  exports: [TypeOrmModule, CommentService],
   controllers: [CommentController],
   providers: [CommentService],
 })

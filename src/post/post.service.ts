@@ -32,15 +32,22 @@ export class PostService {
     return { post, create_post };
   }
 
-  // async readPost(user: User, post_id: number) {
-  //   const post = await this.postRepository.selectPostOne(post_id);
+  async selectPostOne(user_id: number, post_id: number) {
+    const post = await this.postRepository.selectPostOne(user_id, post_id);
 
-  //   let is_writer: boolean = false;
+    for (let i = 0; i < post.length; i++) {
+      if (post[i].tags) {
+        const to_json = JSON.parse(post[i].tags);
 
-  //   if (user.id == post[0].user_id) is_writer = true;
+        post[i].tags = to_json;
+      }
+    }
 
-  //   return { post, is_writer };
-  // }
+    const next_post = await this.postRepository.selectNextPost(post_id);
+    const pre_post = await this.postRepository.selectPrePost(post_id);
+
+    return { post, next_post, pre_post };
+  }
 
   async updatePost(
     user: User,
@@ -73,30 +80,21 @@ export class PostService {
     return { post, delete_post };
   }
 
-  // velogController 따로 구성하여 해당 기능 분리할 예정.
-  //   async selectPostList(
-  //     user: User,
-  //     user_id: number,
-  //     status: number,
-  //     tag: string,
-  //   ) {
-  //     // user에서 받아온 id랑 param으로 넘어온 user_id 비교해서 일치 = is_writer:true 하면 임시 글을 제외한 나머지 글 다 보여주기.
-  //     // 일치하지 않으면 is_writer: false  공개글 목록만 보여주기
-  //     // 태그 선택하면 태그id랑 일치한 것 보여주기
-  //     /*
-  //     -> 필요한 것
-  //     제목
-  //     login_id
-  //     작성일
-  //     공개여부
-  //     태크
-  //     이전포스트
-  //     다음포스트
-  //     */
-  //     let is_writer: boolean = false;
-  //     if(user_id == user.id)
-  //       is_writer = true;
+  async selectPostList(user_id: number, tag_id: number) {
+    const posts = await this.postRepository.selectPostList(
+      user_id,
+      false,
+      tag_id,
+    );
 
-  //     return await this.postRepository.selectPostList(is_writer, status, tag);
-  //   }
+    for (let i = 0; i < posts.length; i++) {
+      if (posts[i].tags) {
+        const to_json = JSON.parse(posts[i].tags);
+
+        posts[i].tags = to_json;
+      }
+    }
+
+    return posts;
+  }
 }

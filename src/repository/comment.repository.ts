@@ -91,7 +91,7 @@ export class CommentRepository extends Repository<Comment> {
       comments.create_at,
       comments.update_at,
       nc.nested_comments,
-      IF(user.id = ?, 'true', 'false') AS comments_is_writer
+      IF(user.id = ?, 1, 0) AS comments_is_writer
       FROM comments
       LEFT JOIN post ON post.id = comments.post_id
       LEFT JOIN user ON user.id = comments.user_id

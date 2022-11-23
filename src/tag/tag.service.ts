@@ -48,4 +48,10 @@ export class TagService {
   async deletePostTag(post_id: number) {
     await this.postTagRepository.deletePostTag(post_id);
   }
+
+  async selectTagListByUserId(user_id: number) {
+    const tags = await this.postTagRepository.selectTagListByUserId(user_id);
+
+    return tags;
+  }
 }

@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
 import { CommentModule } from './comment/comment.module';
+import { InsideModule } from './inside/inside.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CommentModule } from './comment/comment.module';
     PostModule,
     TagModule,
     CommentModule,
+    InsideModule,
   ],
   providers: [],
   controllers: [],

@@ -33,6 +33,9 @@ export class Post extends BaseEntity {
   @Column({ default: 0 })
   likes: number;
 
+  @Column({ default: 0 })
+  comment_count: number;
+
   @CreateDateColumn()
   create_at: Date;
 

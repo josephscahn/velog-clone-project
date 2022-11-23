@@ -8,11 +8,39 @@ import { EntityRepository, Repository } from 'typeorm';
 export class PostRepository extends Repository<Post> {
   async selectPostOne(user_id: number, post_id: number) {
     const post = await this.query(
-      `SELECT id, status, views, likes, create_at, update_at, user_id, title, content, thumbnail,
-      IF(user_id = ?, 'true', 'false') AS is_writer
-      FROM post
-      WHERE id = ?`,
-      [user_id, post_id],
+      `WITH tags AS (
+        SELECT 
+        post.id AS post_id,
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'tag_id', tag.id,
+            'tag_name', tag.name
+          )
+        ) AS tags
+        FROM post
+        LEFT JOIN post_tag pt ON pt.post_id = post.id
+        LEFT JOIN tag ON tag.id = pt.tag_id
+        GROUP BY post.id
+        )
+        
+        SELECT
+        user.id AS user_id,
+        user.login_id,
+        user.name,
+        user.profile_image,
+        user.about_me,
+        post.id,
+        post.title,
+        post.status,
+        post.content,
+        IF(INSTR(tags.tags,'"tag_id": null'), null, tags.tags) AS  tags,
+        post.comment_count,
+        IF(user_id = ?, 1, 0) AS is_writer
+        FROM post
+        LEFT JOIN user ON user.id = post.user_id
+        LEFT JOIN tags ON tags.post_id = post.id
+        WHERE user.id = ? AND post.id = ?`,
+      [user_id, user_id, post_id],
     );
 
     if (post.length <= 0) return 0;
@@ -80,5 +108,87 @@ export class PostRepository extends Repository<Post> {
     } catch (err) {
       return 0;
     }
+  }
+
+  async selectPostList(user_id: number, is_writer: boolean, tag_id: number) {
+    let parameter = [];
+
+    let query = `WITH tags AS (
+      SELECT 
+      post.id AS post_id,
+      post.user_id,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'tag_id', tag.id,
+          'tag_name', tag.name
+        )
+      ) AS tags
+      FROM post
+      LEFT JOIN post_tag pt ON pt.post_id = post.id
+      LEFT JOIN tag ON tag.id = pt.tag_id
+      GROUP BY post.id
+      )
+      
+      SELECT
+      user.id AS user_id,
+      post.id AS post_id,
+      post.thumbnail,
+      post.title,
+      post.content,
+      IF(INSTR(tags.tags,'"tag_id": null'), null, tags.tags) AS  tags,
+      post.create_at,
+      post.comment_count,
+      post.likes,
+      post.status
+      FROM post 
+      LEFT JOIN user ON user.id = post.user_id
+      LEFT JOIN tags ON tags.post_id = post.id
+      LEFT JOIN post_tag pt ON pt.post_id = post.id
+      WHERE user.id = ?`;
+
+    parameter.push(user_id);
+
+    let and_status = ` AND post.status = 1`;
+
+    if (is_writer == true) and_status = ` AND post.status REGEXP '1|2'`; // 게시글 작성자 id랑 일치하면 비공개 목록까지 보여주도록
+
+    let and_tag = ``;
+
+    if (tag_id) {
+      and_tag = ` AND pt.tag_id = ?`;
+      parameter.push(tag_id);
+    }
+
+    query = query + and_status + and_tag;
+
+    const posts = await this.query(query, parameter);
+
+    return posts;
+  }
+
+  async selectNextPost(post_id: number) {
+    const next_post = await this.query(
+      `SELECT 
+    post.id AS post_id,
+    post.title
+    FROM post
+    WHERE id = (SELECT id FROM post WHERE id > ? ORDER BY id LIMIT 1)`,
+      [post_id],
+    );
+
+    return next_post;
+  }
+
+  async selectPrePost(post_id: number) {
+    const pre_post = await this.query(
+      `SELECT 
+    post.id AS post_id,
+    post.title
+    FROM post
+    WHERE id = (SELECT id FROM post WHERE id < ? ORDER BY id DESC LIMIT 1)`,
+      [post_id],
+    );
+
+    return pre_post;
   }
 }
