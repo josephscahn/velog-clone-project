@@ -177,4 +177,13 @@ export class UserController {
     follow = follow[0];
     return { follow };
   }
+
+  @Get()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard)
+  async getMe(@GetUser() user: User) {
+    const id = user.id;
+    const data = await this.userService.getMe(id);
+    return { message: 'getMe success', data };
+  }
 }

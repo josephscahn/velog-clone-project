@@ -97,4 +97,8 @@ export class UserService {
     }
     return returnData;
   }
+
+  async getMe(id: number) {
+    return await this.userRepository.getMe(id);
+  }
 }
