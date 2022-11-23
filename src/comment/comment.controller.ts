@@ -7,8 +7,6 @@ import {
   Patch,
   Delete,
   BadRequestException,
-  Get,
-  NotFoundException,
 } from '@nestjs/common';
 import { CommentDto } from 'src/dto/comment/comment.dto';
 import { CommentService } from './comment.service';
@@ -37,19 +35,24 @@ export class CommentController {
 
     return {
       statusCode: 201,
-      message: 'comment create success',
+      post: result.post.post,
+      next_post: result.post.next_post,
+      pre_post: result.post.pre_post,
+      comments: result.comments,
     };
   }
 
-  @Patch('/:comment_id')
+  @Patch('/:post_id/:comment_id')
   async updateComment(
     @Body() data: CommentDto,
     @Param('comment_id') comment_id: number,
+    @Param('post_id') post_id: number,
     @GetUser() user: User,
   ) {
     const result = await this.commentService.updateComment(
       data,
       comment_id,
+      post_id,
       user.id,
     );
 
@@ -62,36 +65,23 @@ export class CommentController {
     };
   }
 
-  @Delete('/:comment_id')
+  @Delete('/:post_id/:comment_id')
   async deleteComment(
     @Param('comment_id') comment_id: number,
+    @Param('post_id') post_id: number,
     @GetUser() user: User,
   ) {
-    const result = await this.commentService.deleteComment(comment_id, user.id);
+    const result = await this.commentService.deleteComment(
+      comment_id,
+      post_id,
+      user.id,
+    );
 
     if (result == 0) throw new BadRequestException('comment delete failed');
 
     return {
       statusCode: 200,
       message: 'comment delete success',
-      result: result,
-    };
-  }
-
-  @Get('/:post_id')
-  async selectCommentList(
-    @Param('post_id') post_id: number,
-    @GetUser() user: User,
-  ) {
-    const result = await this.commentService.selectCommentList(
-      post_id,
-      user.id,
-    );
-
-    if (result == 0) throw new NotFoundException(`댓글이 존재하지 않습니다.`);
-
-    return {
-      statusCode: 200,
       result: result,
     };
   }

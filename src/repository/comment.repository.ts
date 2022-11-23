@@ -96,7 +96,8 @@ export class CommentRepository extends Repository<Comment> {
       LEFT JOIN post ON post.id = comments.post_id
       LEFT JOIN user ON user.id = comments.user_id
       LEFT JOIN nested_comments nc ON nc.comment_id = comments.id
-      WHERE post.id = ?`,
+      WHERE post.id = ?
+      ORDER BY comments.id DESC`,
       [user_id, user_id, post_id],
     );
 

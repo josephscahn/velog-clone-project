@@ -159,7 +159,9 @@ export class PostRepository extends Repository<Post> {
       parameter.push(tag_id);
     }
 
-    query = query + and_status + and_tag;
+    let order_by = ` ORDER BY post.id DESC`;
+
+    query = query + and_status + and_tag + order_by;
 
     const posts = await this.query(query, parameter);
 
@@ -190,5 +192,12 @@ export class PostRepository extends Repository<Post> {
     );
 
     return pre_post;
+  }
+
+  async updateCommentCount(post_id: number) {
+    await this.query(
+      `UPDATE post SET comment_count = (SELECT COUNT(*) FROM comments WHERE post_id = ?) WHERE id = ?`,
+      [post_id, post_id],
+    );
   }
 }
