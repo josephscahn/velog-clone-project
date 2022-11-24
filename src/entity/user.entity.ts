@@ -42,4 +42,7 @@ export class User extends BaseEntity {
 
   @Column({ default: false })
   update_alert: boolean;
+
+  @Column({ nullable: true })
+  provider: string;
 }

@@ -1,3 +1,4 @@
+import { CreateSocialUserDto } from 'src/dto/user/create-social-user.dto';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
 import { User } from 'src/entity/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
@@ -26,8 +27,25 @@ export class UserRepository extends Repository<User> {
       password: hashedPassword,
       login_id,
       about_me,
+      title: login_id + '.log',
     });
-    await this.save(user);
+    return await this.save(user);
+  }
+
+  async signupWithSocial(createSocialUserDto: CreateSocialUserDto) {
+    const { name, email, login_id, about_me, provider, profile_image } =
+      createSocialUserDto;
+    const user = this.create({
+      name,
+      email,
+      login_id,
+      about_me,
+      provider,
+      profile_image,
+      title: login_id + '.log',
+    });
+
+    return await this.save(user);
   }
 
   async updateUser(id: number, updateData: object) {
