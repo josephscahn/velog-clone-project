@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -15,4 +15,8 @@ export class CreatePostDto {
   @IsOptional()
   @IsString({ each: true })
   readonly tags: string[];
+
+  @IsOptional()
+  @IsNumber()
+  series_id: number;
 }

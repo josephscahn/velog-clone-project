@@ -17,6 +17,7 @@ import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { User } from 'src/entity/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
+import { CreateSeriesDto } from 'src/dto/series/create-series.dto';
 
 @Controller('posts')
 @UseGuards(JwtAuthGuard)
@@ -24,8 +25,7 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   /**
-   * @todo 게시글 작성, 수정, 삭제 시에 썸네일, 시리즈 기능 추가 구현 필요
-   * @todo 게시글 읽기(readPost) 기능은 velogController(이름은 임시)에 옮길 예정 -> /velog/${user_id}/${post_id}
+   * @todo 게시글 작성, 수정 시에 썸네일 기능 추가 구현 필요
    */
 
   @Post('')
@@ -46,16 +46,9 @@ export class PostController {
     return {
       statusCode: 201,
       message: 'post create success',
-      result: result.post,
+      post: result.post,
     };
   }
-
-  // @Get('/:id')
-  // async readPost(@GetUser() user: User, @Param('id') post_id: number,) {
-  //   const result = await this.postService.readPost(user, post_id);
-
-  //   return { statusCode: 200, message: 'read post', result: result };
-  // }
 
   @Patch('/:id')
   async updatePost(
@@ -81,7 +74,7 @@ export class PostController {
     return {
       statusCode: 200,
       message: 'post update success',
-      result: result.post,
+      post: result.post,
     };
   }
 
@@ -97,5 +90,22 @@ export class PostController {
     }
 
     return { statusCode: 200, message: 'post delete success' };
+  }
+
+  @Post('/series')
+  async createSeries(@GetUser() user: User, @Body() data: CreateSeriesDto) {
+    const result = await this.postService.createSeries(
+      user.id,
+      data.series_name,
+    );
+
+    return { statusCode: 200, series: result };
+  }
+
+  @Get('/series')
+  async getSeriesList(@GetUser() user: User) {
+    const result = await this.postService.getSeriesList(user.id);
+
+    return { statusCode: 200, series: result };
   }
 }

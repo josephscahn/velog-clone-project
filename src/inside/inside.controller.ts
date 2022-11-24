@@ -24,6 +24,7 @@ export class InsideController {
 
     return {
       statusCode: 200,
+      series: result.series,
       post: result.post.post,
       next_post: result.post.next_post,
       pre_post: result.post.pre_post,

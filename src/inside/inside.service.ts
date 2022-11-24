@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CommentService } from 'src/comment/comment.service';
 import { PostService } from 'src/post/post.service';
+import { SeriesService } from 'src/series/series.service';
 import { TagService } from 'src/tag/tag.service';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class InsideService {
     private postService: PostService,
     private commentService: CommentService,
     private tagService: TagService,
+    private seriesService: SeriesService,
   ) {}
 
   async getInsidePage(user_id: number, tag_id: number) {
@@ -24,10 +26,12 @@ export class InsideService {
       post_id,
       user_id,
     );
+    const series = await this.seriesService.selectPostSeriesList(post_id);
 
     return {
       post,
       comments,
+      series,
     };
   }
 

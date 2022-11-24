@@ -3,6 +3,7 @@ import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { User } from 'src/entity/user.entity';
 import { PostRepository } from 'src/repository/post.repository';
+import { SeriesService } from 'src/series/series.service';
 import { TagService } from 'src/tag/tag.service';
 
 /**
@@ -15,6 +16,7 @@ export class PostService {
   constructor(
     private postRepository: PostRepository,
     private tagService: TagService,
+    private seriesService: SeriesService,
   ) {}
 
   async createPost(user: User, data: CreatePostDto, status: number) {
@@ -25,7 +27,17 @@ export class PostService {
     );
 
     if (data.tags.length > 0)
+      // 게시글 태그 관련
       await this.tagService.tagAction(data.tags, create_post, user.id);
+
+    if (data.series_id) {
+      // 게시글 시리즈 관련
+      await this.seriesService.createPostSeries(
+        create_post,
+        data.series_id,
+        user.id,
+      );
+    }
 
     const post = await this.postRepository.selectPostOne(user.id, create_post);
 
@@ -68,6 +80,17 @@ export class PostService {
       await this.tagService.tagAction(data.tags, post_id, user.id);
     }
 
+    if (!data.series_id) {
+      // 시리즈에서 제외 시켰을 경우 post_series 테이블에 삭제되어야 함.
+      await this.seriesService.deletePostSeries(post_id, user.id);
+    } else {
+      await this.seriesService.createPostSeries(
+        post_id,
+        data.series_id,
+        user.id,
+      );
+    }
+
     const post = await this.postRepository.selectPostOne(user.id, post_id);
 
     return { post, update_post };
@@ -96,5 +119,13 @@ export class PostService {
     }
 
     return posts;
+  }
+
+  async createSeries(user_id: number, series_name: string) {
+    return this.seriesService.createSeries(user_id, series_name);
+  }
+
+  async getSeriesList(user_id: number) {
+    return this.seriesService.selectSeriesList(user_id);
   }
 }

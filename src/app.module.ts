@@ -6,6 +6,7 @@ import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
 import { CommentModule } from './comment/comment.module';
 import { InsideModule } from './inside/inside.module';
+import { SeriesModule } from './series/series.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { InsideModule } from './inside/inside.module';
     TagModule,
     CommentModule,
     InsideModule,
+    SeriesModule,
   ],
   providers: [],
   controllers: [],
