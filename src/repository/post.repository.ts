@@ -200,4 +200,56 @@ export class PostRepository extends Repository<Post> {
       [post_id, post_id],
     );
   }
+
+  async selectPostListForMain(type: string, period: string) {
+    let query = `SELECT 
+   user.id AS user_id,
+   user.profile_image,
+   user.login_id,
+   post.id AS post_id,
+   post.thumbnail, 
+   post.title,
+   post.content,
+   post.create_at,
+   post.comment_count,
+   post.likes,
+   post.views
+   FROM post
+   LEFT JOIN user ON user.id = post.user_id`;
+
+    let period_condition = ``;
+    let type_condition = ``;
+
+    switch (period) {
+      case 'TODAY':
+        period_condition = ` WHERE DAYOFMONTH(post.create_at) = DAYOFMONTH(CURDATE()) `;
+        break;
+      case 'WEEK':
+        period_condition = ` WHERE post.create_at BETWEEN DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE())-1) DAY), '%Y/%m/%d') AND
+        DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE())-7) DAY), '%Y/%m/%d') `;
+        break;
+      case 'MONTH':
+        period_condition = ` WHERE MONTH(post.create_at) = MONTH(NOW()) `;
+        break;
+      case 'YEAR':
+        period_condition = ` WHERE YEAR(post.create_at) = YEAR(NOW()) `;
+        break;
+    }
+
+    switch (type) {
+      case 'NEW':
+        type_condition = ` ORDER BY post.create_at DESC;`;
+        break;
+      case 'TREND':
+        type_condition = ` AND post.likes > 0 AND post.views > 0 GROUP BY post.id ORDER BY SUM(post.likes + post.views) DESC`;
+        //조회 수 + 좋아요 를 더하여 정렬. 조회수와 좋아요는 최소 1 이상 일 때
+        break;
+    }
+
+    query = query + period_condition + type_condition;
+
+    const main_posts = await this.query(query);
+
+    return main_posts;
+  }
 }

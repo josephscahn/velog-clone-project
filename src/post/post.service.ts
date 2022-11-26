@@ -128,4 +128,12 @@ export class PostService {
   async getSeriesList(user_id: number) {
     return this.seriesService.selectSeriesList(user_id);
   }
+
+  async selectPostListForMain(type: string, period: string) {
+    if (type == 'TREND' && !period) return 0;
+
+    const posts = await this.postRepository.selectPostListForMain(type, period);
+
+    return posts;
+  }
 }

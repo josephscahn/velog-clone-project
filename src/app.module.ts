@@ -7,6 +7,7 @@ import { TagModule } from './tag/tag.module';
 import { CommentModule } from './comment/comment.module';
 import { InsideModule } from './inside/inside.module';
 import { SeriesModule } from './series/series.module';
+import { MainModule } from './main/main.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SeriesModule } from './series/series.module';
     CommentModule,
     InsideModule,
     SeriesModule,
+    MainModule,
   ],
   providers: [],
   controllers: [],
