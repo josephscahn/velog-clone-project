@@ -82,4 +82,19 @@ export class UserRepository extends Repository<User> {
       [id],
     );
   }
+
+  async updateAboutBlog(user_id: number, about_blog: string) {
+    await this.createQueryBuilder()
+      .update()
+      .set({ about_blog: about_blog })
+      .where('id = :user_id', { user_id: user_id })
+      .execute();
+  }
+
+  async selectAboutBlog(user_id: number) {
+    return await this.query(
+      `SELECT id AS user_id, about_blog FROM user WHERE id = ?`,
+      [user_id],
+    );
+  }
 }

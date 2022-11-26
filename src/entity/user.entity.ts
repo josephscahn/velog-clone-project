@@ -29,7 +29,7 @@ export class User extends BaseEntity {
   profile_image: string;
 
   @Column({ nullable: true })
-  description: string;
+  about_blog: string;
 
   @Column({ nullable: true })
   about_me: string;

@@ -101,4 +101,12 @@ export class UserService {
   async getMe(id: number) {
     return await this.userRepository.getMe(id);
   }
+
+  async updateAboutBlog(user_id: number, about_blog: string) {
+    await this.userRepository.updateAboutBlog(user_id, about_blog);
+  }
+
+  async selectAboutBlog(user_id: number) {
+    return await this.userRepository.selectAboutBlog(user_id);
+  }
 }

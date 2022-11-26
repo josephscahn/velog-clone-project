@@ -19,7 +19,7 @@ import { UserService } from './user.service';
       FollowRepository,
     ]),
   ],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, UserService],
   controllers: [UserController],
   providers: [
     UserService,

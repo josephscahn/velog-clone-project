@@ -3,6 +3,7 @@ import { CommentService } from 'src/comment/comment.service';
 import { PostService } from 'src/post/post.service';
 import { SeriesService } from 'src/series/series.service';
 import { TagService } from 'src/tag/tag.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class InsideService {
@@ -11,6 +12,7 @@ export class InsideService {
     private commentService: CommentService,
     private tagService: TagService,
     private seriesService: SeriesService,
+    private userService: UserService,
   ) {}
 
   async getInsidePage(user_id: number, tag_id: number) {
@@ -36,10 +38,16 @@ export class InsideService {
   }
 
   async getSeries(user_id: number) {
-    // 시리즈 들고오는 것
+    return;
   }
 
-  async getAbout(user_id: number) {
-    // 소개 들고오는 것
+  async getAboutBlog(user_id: number) {
+    return await this.userService.selectAboutBlog(user_id);
+  }
+
+  async editAboutBlog(user_id: number, about_blog: string) {
+    await this.userService.updateAboutBlog(user_id, about_blog);
+
+    return await this.userService.selectAboutBlog(user_id);
   }
 }
