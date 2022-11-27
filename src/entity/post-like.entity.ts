@@ -9,8 +9,8 @@ import {
 import { Post } from './post.entity';
 import { User } from './user.entity';
 
-@Entity({ name: 'post_read_log' })
-export class PostReadLog extends BaseEntity {
+@Entity({ name: 'post_like' })
+export class PostLike extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

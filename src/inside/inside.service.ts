@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CommentService } from 'src/comment/comment.service';
 import { PostService } from 'src/post/post.service';
 import { PostReadLogRepository } from 'src/repository/post-read-log.repository';
@@ -7,6 +11,8 @@ import { TagService } from 'src/tag/tag.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/entity/user.entity';
 import { UserService } from 'src/user/user.service';
+import { PostLikeRepository } from 'src/repository/post-like.repository';
+import { PostRepository } from 'src/repository/post.repository';
 
 @Injectable()
 export class InsideService {
@@ -16,8 +22,9 @@ export class InsideService {
     private tagService: TagService,
     private seriesService: SeriesService,
     private postReadLogRepository: PostReadLogRepository,
-    private readonly jwtService: JwtService,
     private userService: UserService,
+    private postLikeRepository: PostLikeRepository,
+    private postRepository: PostRepository,
   ) {}
 
   async getInsidePage(user_id: number, tag_id: number) {
@@ -65,5 +72,29 @@ export class InsideService {
     await this.userService.updateAboutBlog(user_id, about_blog);
 
     return await this.userService.selectAboutBlog(user_id);
+  }
+
+  async likePost(user_id: number, post_id: number) {
+    const data = await this.postLikeRepository.getLikedPostOne(
+      user_id,
+      post_id,
+    );
+    if (data) {
+      return new NotFoundException('이미 좋아요 한 게시글 입니다');
+    }
+    await this.postLikeRepository.likePost(user_id, post_id);
+    await this.postRepository.updateLikeCount(post_id);
+  }
+
+  async unlikePost(user_id: number, post_id: number) {
+    const data = await this.postLikeRepository.getLikedPostOne(
+      user_id,
+      post_id,
+    );
+    if (!data) {
+      return new NotFoundException('좋아요를 하지 않은 게시글입니다');
+    }
+    await this.postLikeRepository.unlikePost(user_id, post_id);
+    await this.postRepository.updateLikeCount(post_id);
   }
 }

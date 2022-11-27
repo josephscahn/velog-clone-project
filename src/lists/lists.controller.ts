@@ -1,6 +1,5 @@
 import {
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
@@ -32,6 +31,13 @@ export class ListsController {
     @Param('post_id') post_id: number,
   ) {
     const data = await this.listsService.deleteReadList(user.id, post_id);
+    return data;
+  }
+
+  @Get('/like')
+  @UseGuards(JwtAuthGuard)
+  async getLikedList(@GetUser() user: User) {
+    const data = await this.listsService.getLikedList(user.id);
     return data;
   }
 }

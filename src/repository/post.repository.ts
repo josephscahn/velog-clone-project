@@ -201,6 +201,13 @@ export class PostRepository extends Repository<Post> {
     );
   }
 
+  async updateLikeCount(post_id: number) {
+    await this.query(
+      `UPDATE post SET likes = (SELECT COUNT(*) FROM post_like WHERE post_id = ?) WHERE id = ?`,
+      [post_id, post_id],
+    );
+  }
+
   async selectPostListForMain(type: string, period: string) {
     let query = `SELECT 
    user.id AS user_id,

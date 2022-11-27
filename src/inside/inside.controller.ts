@@ -1,18 +1,20 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { ValidateToken } from 'src/custom-decorator/validate-token.decorator';
 import { User } from 'src/entity/user.entity';
 import { AboutBlogDto } from 'src/dto/user/about-blog.dto';
 import { InsideService } from './inside.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { GetUser } from 'src/custom-decorator/get-user.decorator';
 
 @Controller('inside')
 export class InsideController {
@@ -71,5 +73,19 @@ export class InsideController {
     );
 
     return { statusCode: 200, about: result };
+  }
+
+  @Post('/:post_id/like')
+  @UseGuards(JwtAuthGuard)
+  async likePost(@Param('post_id') post_id: number, @GetUser() user: User) {
+    await this.insideService.likePost(user.id, post_id);
+    return { statusCode: 200 };
+  }
+
+  @Delete('/:post_id/like')
+  @UseGuards(JwtAuthGuard)
+  async unlikePost(@Param('post_id') post_id: number, @GetUser() user: User) {
+    await this.insideService.unlikePost(user.id, post_id);
+    return { statusCode: 204 };
   }
 }
