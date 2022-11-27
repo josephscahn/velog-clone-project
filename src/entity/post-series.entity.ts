@@ -14,11 +14,11 @@ export class PostSeries {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Series)
+  @ManyToOne((type) => Series, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'series_id' })
   series: number;
 
-  @ManyToOne((type) => Post)
+  @ManyToOne((type) => Post, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post: number;
 

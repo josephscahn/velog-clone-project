@@ -13,11 +13,11 @@ export class PostTag extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Tag)
+  @ManyToOne((type) => Tag, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'tag_id' })
   tag: number;
 
-  @ManyToOne((type) => Post)
+  @ManyToOne((type) => Post, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post: number;
 }

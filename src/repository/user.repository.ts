@@ -97,4 +97,11 @@ export class UserRepository extends Repository<User> {
       [user_id],
     );
   }
+
+  async withdrawal(user_id: number) {
+    await this.createQueryBuilder()
+      .delete()
+      .where('id = :user_id', { user_id })
+      .execute();
+  }
 }

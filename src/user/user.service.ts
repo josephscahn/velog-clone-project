@@ -109,4 +109,8 @@ export class UserService {
   async selectAboutBlog(user_id: number) {
     return await this.userRepository.selectAboutBlog(user_id);
   }
+
+  async withdrawal(user_id: number) {
+    await this.userRepository.withdrawal(user_id);
+  }
 }

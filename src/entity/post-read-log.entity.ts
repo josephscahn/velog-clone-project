@@ -14,11 +14,11 @@ export class PostReadLog extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => User)
+  @ManyToOne((type) => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: number;
 
-  @ManyToOne((type) => Post)
+  @ManyToOne((type) => Post, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post: number;
 

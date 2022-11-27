@@ -186,4 +186,10 @@ export class UserController {
     const data = await this.userService.getMe(id);
     return { message: 'getMe success', data };
   }
+
+  @Delete()
+  @UseGuards(JwtAuthGuard)
+  async withdrawal(@GetUser() user: User) {
+    await this.userService.withdrawal(user.id);
+  }
 }

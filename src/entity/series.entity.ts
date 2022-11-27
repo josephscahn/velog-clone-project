@@ -28,7 +28,7 @@ export class Series {
   @UpdateDateColumn()
   update_at: Date;
 
-  @ManyToOne((type) => User)
+  @ManyToOne((type) => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: number;
 }

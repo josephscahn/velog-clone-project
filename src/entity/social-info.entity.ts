@@ -28,7 +28,7 @@ export class SocialInfo extends BaseEntity {
   @Column({ nullable: true })
   url: string;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: number;
 }
