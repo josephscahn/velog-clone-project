@@ -235,5 +235,34 @@ export class PostRepository extends Repository<Post> {
     return await main_posts.getRawMany();
   }
 
-  async interestedPostList(tag_ids: string) {}
+  async interestedPostList(tag_ids: string[]) {}
+
+  async mainSearch(keywords: string) {
+    console.log(keywords);
+    let main_search = this.createQueryBuilder('post')
+      .leftJoin('post.user', 'user')
+      .leftJoin('post.tags', 'tags')
+      .leftJoin('post_tag', 'post_tag', 'post.id = post_tag.post_id')
+      .leftJoin('tag', 'tag', 'post_tag.tag_id = tag.id')
+      .select([
+        'user.id AS user_id',
+        'user.profile_image',
+        'user.login_id',
+        'post.id AS post_id',
+        'post.thumbnail',
+        'post.title',
+        'post.content',
+        'post.create_at',
+        'post.comment_count',
+        'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
+      ])
+      .orWhere('post.title REGEXP :keywords', { keywords: keywords })
+      .orWhere('post.content REGEXP :keywords', { keywords: keywords })
+      .orWhere('tag.name REGEXP :keywords', { keywords: keywords })
+      .groupBy('post.id')
+      .orderBy('post.id', 'DESC')
+      .limit(10000);
+
+    return await main_search.getRawMany();
+  }
 }

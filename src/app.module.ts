@@ -9,6 +9,7 @@ import { InsideModule } from './inside/inside.module';
 import { SeriesModule } from './series/series.module';
 import { ListsModule } from './lists/lists.module';
 import { MainModule } from './main/main.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MainModule } from './main/main.module';
     SeriesModule,
     ListsModule,
     MainModule,
+    SearchModule,
   ],
   providers: [],
   controllers: [],
