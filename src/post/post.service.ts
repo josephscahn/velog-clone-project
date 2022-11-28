@@ -5,6 +5,7 @@ import { User } from 'src/entity/user.entity';
 import { PostRepository } from 'src/repository/post.repository';
 import { SeriesService } from 'src/series/series.service';
 import { TagService } from 'src/tag/tag.service';
+import { getImageURL, deleteImageFile } from 'src/lib/multerOptions';
 
 /**
  * @todo 게시글 삭제 시에 tag 테이블의 post_count 관련 기능은 추후 구현할 예정..
@@ -55,8 +56,11 @@ export class PostService {
       }
     }
 
-    const next_post = await this.postRepository.selectNextPost(post_id);
-    const pre_post = await this.postRepository.selectPrePost(post_id);
+    const next_post = await this.postRepository.selectNextPost(
+      post_id,
+      user_id,
+    );
+    const pre_post = await this.postRepository.selectPrePost(post_id, user_id);
 
     return { post, next_post, pre_post };
   }
@@ -106,7 +110,7 @@ export class PostService {
   async selectPostList(user_id: number, tag_id: number) {
     const posts = await this.postRepository.selectPostList(
       user_id,
-      false,
+      true,
       tag_id,
     );
 
@@ -135,5 +139,15 @@ export class PostService {
     const posts = await this.postRepository.selectPostListForMain(type, period);
 
     return posts;
+  }
+
+  async thumbnailUpload(files: File[], file_name: string) {
+    if (file_name) deleteImageFile(file_name);
+
+    return getImageURL(files);
+  }
+
+  async thumbnailDelete(file_name: string) {
+    deleteImageFile(file_name);
   }
 }

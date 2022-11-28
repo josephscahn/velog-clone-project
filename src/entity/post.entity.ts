@@ -7,8 +7,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
+  JoinTable,
 } from 'typeorm';
+import { PostTag } from './post-tag.entity';
 import { User } from './user.entity';
+import { TagsView } from './view-tags.entity';
 
 @Entity({ name: 'post' })
 export class Post extends BaseEntity {
@@ -45,4 +49,30 @@ export class Post extends BaseEntity {
   @ManyToOne((type) => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToMany((type) => PostTag, (post_tag) => post_tag.post)
+  @JoinTable({
+    joinColumn: {
+      name: 'post_tag',
+      referencedColumnName: 'post_id',
+    },
+    inverseJoinColumn: {
+      name: 'post',
+      referencedColumnName: 'id',
+    },
+  })
+  post_tag: PostTag[];
+
+  @OneToMany((type) => TagsView, (tags) => tags.post)
+  @JoinTable({
+    joinColumn: {
+      name: 'tags',
+      referencedColumnName: 'post_id',
+    },
+    inverseJoinColumn: {
+      name: 'post',
+      referencedColumnName: 'id',
+    },
+  })
+  tags: TagsView;
 }

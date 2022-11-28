@@ -10,7 +10,6 @@ import { SeriesModule } from './series/series.module';
 import { ListsModule } from './lists/lists.module';
 import { MainModule } from './main/main.module';
 
-
 @Module({
   imports: [
     TypeOrmModule.forRoot(),

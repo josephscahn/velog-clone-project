@@ -10,6 +10,8 @@ import {
   Query,
   BadRequestException,
   NotFoundException,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { PostService } from './post.service';
@@ -18,15 +20,13 @@ import { User } from 'src/entity/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { CreateSeriesDto } from 'src/dto/series/create-series.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/lib/multerOptions';
 
 @Controller('posts')
 @UseGuards(JwtAuthGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
-
-  /**
-   * @todo 게시글 작성, 수정 시에 썸네일 기능 추가 구현 필요
-   */
 
   @Post('')
   async createPost(
@@ -47,6 +47,31 @@ export class PostController {
       statusCode: 201,
       message: 'post create success',
       post: result.post,
+    };
+  }
+
+  @UseInterceptors(FilesInterceptor('image', 1, multerOptions))
+  @Post('/thumbnai')
+  thumbnailUpload(
+    @UploadedFiles() files: File[],
+    @Body('file_name') file_name: string,
+  ) {
+    const result = this.postService.thumbnailUpload(files, file_name);
+
+    return {
+      statusCode: 200,
+      message: 'thumbnail upload success',
+      imageUrl: result,
+    };
+  }
+
+  @Delete('/thumbnai')
+  thumbnailDelete(@Body('file_name') file_name: string) {
+    this.postService.thumbnailDelete(file_name);
+
+    return {
+      statusCode: 200,
+      message: 'thumbnail delete success',
     };
   }
 

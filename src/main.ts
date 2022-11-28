@@ -5,6 +5,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from 'config/config.service';
 import * as fs from 'fs';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
   await makeOrmConfig();
@@ -18,6 +20,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.use('/public', express.static(join(__dirname, '../public')));
 
   app.enableCors();
 
