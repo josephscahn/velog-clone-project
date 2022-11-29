@@ -1,16 +1,18 @@
 require('dotenv').config();
 
+import { BadRequestException } from '@nestjs/common';
 import { existsSync, fstat, mkdirSync, unlinkSync } from 'fs';
 import { diskStorage } from 'multer';
 import uuidRandom from './uuidRandom';
 
 export const multerOptions = {
   fileFilter: (request, file, callback) => {
-    if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
-      // 이미지 형식은 jpg, jpeg, png만 허용합니다.
+    if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
       callback(null, true);
     } else {
-      console.log('지원하지 않는 이미지 형식 ㅇㅇ');
+      throw new BadRequestException(
+        '지원하지 않는 형식의 파일입니다. (jpg, jpeg, png, gif 만 허용)',
+      );
     }
   },
 

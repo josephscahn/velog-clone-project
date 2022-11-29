@@ -22,11 +22,31 @@ import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { CreateSeriesDto } from 'src/dto/series/create-series.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/lib/multerOptions';
+import { PaginationDto } from 'src/dto/pagination.dto';
 
 @Controller('posts')
 @UseGuards(JwtAuthGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
+
+  @Get('/:user_id')
+  async savesPostList(
+    @GetUser() user: User,
+    @Param('user_id') user_id: number,
+    @Query() pagination: PaginationDto,
+  ) {
+    const result = await this.postService.selectPostList(
+      user_id,
+      null,
+      true,
+      pagination,
+    );
+
+    return {
+      statusCode: 200,
+      post: result,
+    };
+  }
 
   @Post('')
   async createPost(
@@ -39,24 +59,24 @@ export class PostController {
     if (result.create_post == 0)
       throw new BadRequestException(`post create failed`);
 
-    if (result.post == 0) {
-      throw new NotFoundException(`해당 게시글을 찾을 수 없습니다.`);
-    }
-
     return {
       statusCode: 201,
       message: 'post create success',
-      post: result.post,
+      series: result.series[0],
+      post: result.post.post[0],
+      next_post: result.post.next_post[0],
+      pre_post: result.post.pre_post[0],
+      interested: result.post.interested_posts[0],
     };
   }
 
   @UseInterceptors(FilesInterceptor('image', 1, multerOptions))
-  @Post('/thumbnai')
-  thumbnailUpload(
+  @Post('/thumbnail')
+  async thumbnailUpload(
     @UploadedFiles() files: File[],
     @Body('file_name') file_name: string,
   ) {
-    const result = this.postService.thumbnailUpload(files, file_name);
+    const result = await this.postService.thumbnailUpload(files, file_name);
 
     return {
       statusCode: 200,
@@ -65,7 +85,7 @@ export class PostController {
     };
   }
 
-  @Delete('/thumbnai')
+  @Delete('/thumbnail')
   thumbnailDelete(@Body('file_name') file_name: string) {
     this.postService.thumbnailDelete(file_name);
 
@@ -99,7 +119,11 @@ export class PostController {
     return {
       statusCode: 200,
       message: 'post update success',
-      post: result.post,
+      series: result.series[0],
+      post: result.post.post[0],
+      next_post: result.post.next_post[0],
+      pre_post: result.post.pre_post[0],
+      interested: result.post.interested_posts[0],
     };
   }
 

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PaginationDto } from 'src/dto/pagination.dto';
 import { PostSeriesRepository } from 'src/repository/post-series.repository';
 import { SeriesRepository } from 'src/repository/series.repository';
 
@@ -50,11 +51,18 @@ export class SeriesService {
     return post_series;
   }
 
-  async selectSeriesDetail(user_id: number, series_id: number, type: string) {
+  async selectSeriesDetail(
+    user_id: number,
+    series_id: number,
+    sort: string,
+    pagination: PaginationDto,
+  ) {
     const series = await this.seriesRepository.selectSeriesDetail(
       user_id,
       series_id,
-      type,
+      sort,
+      pagination.offset,
+      pagination.limit,
     );
 
     return series;

@@ -12,6 +12,7 @@ import { User } from 'src/entity/user.entity';
 import { UserService } from 'src/user/user.service';
 import { PostLikeRepository } from 'src/repository/post-like.repository';
 import { PostRepository } from 'src/repository/post.repository';
+import { PaginationDto } from 'src/dto/pagination.dto';
 
 @Injectable()
 export class LologService {
@@ -26,8 +27,17 @@ export class LologService {
     private postRepository: PostRepository,
   ) {}
 
-  async getInsidePage(user_id: number, tag_id: number) {
-    const posts = await this.postService.selectPostList(user_id, tag_id);
+  async getInsidePage(
+    user_id: number,
+    tag_id: number,
+    pagination: PaginationDto,
+  ) {
+    const posts = await this.postService.selectPostList(
+      user_id,
+      tag_id,
+      false,
+      pagination,
+    );
     const tags = await this.tagService.selectTagListByUserId(user_id);
 
     return { posts, tags };
@@ -64,11 +74,17 @@ export class LologService {
     return series;
   }
 
-  async getSeriesDetail(user_id: number, series_id: number, type: string) {
+  async getSeriesDetail(
+    user_id: number,
+    series_id: number,
+    sort: string,
+    pagination: PaginationDto,
+  ) {
     const series = await this.seriesService.selectSeriesDetail(
       user_id,
       series_id,
-      type,
+      sort,
+      pagination,
     );
 
     return series;

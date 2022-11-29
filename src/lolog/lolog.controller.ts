@@ -15,6 +15,7 @@ import { AboutBlogDto } from 'src/dto/user/about-blog.dto';
 import { LologService } from './lolog.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetUser } from 'src/custom-decorator/get-user.decorator';
+import { PaginationDto } from 'src/dto/pagination.dto';
 
 @Controller('lolog')
 export class LologController {
@@ -38,12 +39,14 @@ export class LologController {
   async getSeriesDetail(
     @Param('user_id') user_id: number,
     @Param('series_id') series_id: number,
-    @Query('type') type: string,
+    @Query('sort') sort: string,
+    @Query() pagination: PaginationDto,
   ) {
     const result = await this.lologService.getSeriesDetail(
       user_id,
       series_id,
-      type,
+      sort,
+      pagination,
     );
 
     return { statusCode: 200, series: result };
@@ -74,8 +77,13 @@ export class LologController {
   async getInsidePage(
     @Param('user_id') user_id: number,
     @Query('tag_id') tag_id: number,
+    @Query() pagination: PaginationDto,
   ) {
-    const result = await this.lologService.getInsidePage(user_id, tag_id);
+    const result = await this.lologService.getInsidePage(
+      user_id,
+      tag_id,
+      pagination,
+    );
 
     return { statusCode: 200, posts: result.posts, tags: result.tags };
   }
@@ -94,11 +102,12 @@ export class LologController {
 
     return {
       statusCode: 200,
-      series: result.series,
-      post: result.post.post,
-      next_post: result.post.next_post,
-      pre_post: result.post.pre_post,
-      comments: result.comments,
+      series: result.series[0],
+      post: result.post.post[0],
+      next_post: result.post.next_post[0],
+      pre_post: result.post.pre_post[0],
+      comments: result.comments[0],
+      interested: result.post.interested_posts[0],
     };
   }
 
