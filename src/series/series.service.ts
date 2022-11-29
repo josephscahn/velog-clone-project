@@ -24,8 +24,8 @@ export class SeriesService {
     await this.seriesRepository.updateSeriesPostCount(user_id);
   }
 
-  async deletePostSeries(post_id: number, user_id: number) {
-    await this.postSeriesRepository.deletePostSeries(post_id);
+  async deletePostSeries(post_id: number, user_id: number, seires_id: number) {
+    await this.postSeriesRepository.deletePostSeries(post_id, 0);
 
     await this.seriesRepository.updateSeriesPostCount(user_id);
   }
@@ -48,5 +48,30 @@ export class SeriesService {
     );
 
     return post_series;
+  }
+
+  async selectSeriesDetail(user_id: number, series_id: number, type: string) {
+    const series = await this.seriesRepository.selectSeriesDetail(
+      user_id,
+      series_id,
+      type,
+    );
+
+    return series;
+  }
+
+  async updatePostSeriesSort(series_id: number, sort) {
+    for (let i = 0; i < sort.length; i++) {
+      await this.postSeriesRepository.updatePostSeriesSort(
+        series_id,
+        Number.parseInt(sort[i].post_id),
+        sort[i].sort,
+      );
+    }
+  }
+
+  async deleteSeries(seires_id: number) {
+    await this.postSeriesRepository.deletePostSeries(0, seires_id);
+    await this.seriesRepository.deleteSeries(seires_id);
   }
 }

@@ -8,14 +8,13 @@ import { PostService } from 'src/post/post.service';
 import { PostReadLogRepository } from 'src/repository/post-read-log.repository';
 import { SeriesService } from 'src/series/series.service';
 import { TagService } from 'src/tag/tag.service';
-import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/entity/user.entity';
 import { UserService } from 'src/user/user.service';
 import { PostLikeRepository } from 'src/repository/post-like.repository';
 import { PostRepository } from 'src/repository/post.repository';
 
 @Injectable()
-export class InsideService {
+export class LologService {
   constructor(
     private postService: PostService,
     private commentService: CommentService,
@@ -61,7 +60,26 @@ export class InsideService {
   }
 
   async getSeries(user_id: number) {
-    return;
+    const series = await this.seriesService.selectSeriesList(user_id);
+    return series;
+  }
+
+  async getSeriesDetail(user_id: number, series_id: number, type: string) {
+    const series = await this.seriesService.selectSeriesDetail(
+      user_id,
+      series_id,
+      type,
+    );
+
+    return series;
+  }
+
+  async editSeries(series_id: number, sort) {
+    await this.seriesService.updatePostSeriesSort(series_id, sort);
+  }
+
+  async deleteSeries(seires_id: number, user_id: number) {
+    await this.seriesService.deleteSeries(seires_id);
   }
 
   async getAboutBlog(user_id: number) {

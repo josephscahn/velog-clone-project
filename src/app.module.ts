@@ -5,7 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
 import { CommentModule } from './comment/comment.module';
-import { InsideModule } from './inside/inside.module';
+import { LologModule } from './lolog/lolog.module';
 import { SeriesModule } from './series/series.module';
 import { ListsModule } from './lists/lists.module';
 import { MainModule } from './main/main.module';
@@ -19,7 +19,7 @@ import { SearchModule } from './search/search.module';
     PostModule,
     TagModule,
     CommentModule,
-    InsideModule,
+    LologModule,
     SeriesModule,
     ListsModule,
     MainModule,

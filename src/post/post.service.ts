@@ -86,7 +86,7 @@ export class PostService {
 
     if (!data.series_id) {
       // 시리즈에서 제외 시켰을 경우 post_series 테이블에 삭제되어야 함.
-      await this.seriesService.deletePostSeries(post_id, user.id);
+      await this.seriesService.deletePostSeries(post_id, user.id, 0);
     } else {
       await this.seriesService.createPostSeries(
         post_id,

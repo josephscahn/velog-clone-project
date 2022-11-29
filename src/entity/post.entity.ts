@@ -10,6 +10,7 @@ import {
   OneToMany,
   JoinTable,
 } from 'typeorm';
+import { PostSeries } from './post-series.entity';
 import { PostTag } from './post-tag.entity';
 import { User } from './user.entity';
 import { TagsView } from './view-tags.entity';
@@ -28,7 +29,7 @@ export class Post extends BaseEntity {
   @Column({ type: 'tinyint' })
   status: number;
 
-  @Column({ length: 3000 })
+  @Column({ length: 3000, nullable: true })
   thumbnail: string;
 
   @Column({ default: 0 })

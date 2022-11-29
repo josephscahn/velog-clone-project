@@ -8,8 +8,8 @@ import { PostReadLogRepository } from 'src/repository/post-read-log.repository';
 import { SeriesModule } from 'src/series/series.module';
 import { TagModule } from 'src/tag/tag.module';
 import { UserModule } from 'src/user/user.module';
-import { InsideController } from './inside.controller';
-import { InsideService } from './inside.service';
+import { LologController } from './lolog.controller';
+import { LologService } from './lolog.service';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { InsideService } from './inside.service';
       secret: process.env.SECRET_KEY,
     }),
   ],
-  controllers: [InsideController],
-  providers: [InsideService],
+  controllers: [LologController],
+  providers: [LologService],
 })
-export class InsideModule {}
+export class LologModule {}

@@ -7,7 +7,10 @@ import {
   ManyToOne,
   JoinColumn,
   Unique,
+  OneToMany,
+  JoinTable,
 } from 'typeorm';
+import { PostSeries } from './post-series.entity';
 import { User } from './user.entity';
 
 @Entity({ name: 'series' })
@@ -31,4 +34,17 @@ export class Series {
   @ManyToOne((type) => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: number;
+
+  @OneToMany((type) => PostSeries, (post_series) => post_series.series)
+  @JoinTable({
+    joinColumn: {
+      name: 'post_series',
+      referencedColumnName: 'series_id',
+    },
+    inverseJoinColumn: {
+      name: 'series',
+      referencedColumnName: 'id',
+    },
+  })
+  post_series: PostSeries;
 }
