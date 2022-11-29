@@ -13,8 +13,12 @@ export class SearchController {
 
   @Get('/main')
   @UsePipes(ValidationPipe)
-  async mainSearch(@Query('keyword') keyword: string) {
-    const data = await this.searchService.mainSearch(keyword);
+  async mainSearch(
+    @Query('keyword') keyword: string,
+    @Query('userId') user_id: number,
+  ) {
+    const data = await this.searchService.mainSearch(keyword, user_id);
+
     return data;
   }
 }

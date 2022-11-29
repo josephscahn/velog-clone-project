@@ -237,8 +237,8 @@ export class PostRepository extends Repository<Post> {
 
   async interestedPostList(tag_ids: string[]) {}
 
-  async mainSearch(keywords: string) {
-    console.log(keywords);
+
+  async mainSearch(keywords: string, user_id: number) {
     let main_search = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
       .leftJoin('post.tags', 'tags')
@@ -263,6 +263,9 @@ export class PostRepository extends Repository<Post> {
       .orderBy('post.id', 'DESC')
       .limit(10000);
 
+    if (user_id) {
+      main_search.andWhere('post.user_id = :user_id', { user_id: user_id });
+    }
     return await main_search.getRawMany();
   }
 }
