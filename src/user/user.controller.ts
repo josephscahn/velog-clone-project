@@ -184,7 +184,7 @@ export class UserController {
   async getMe(@GetUser() user: User) {
     const id = user.id;
     const data = await this.userService.getMe(id);
-    return { message: 'getMe success', data };
+    return { message: 'getMe success', user: data[0] };
   }
 
   @Delete()
