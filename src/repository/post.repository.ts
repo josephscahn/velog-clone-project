@@ -2,7 +2,7 @@ import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { Post } from 'src/entity/post.entity';
 import { User } from 'src/entity/user.entity';
-import { EntityRepository, Repository } from 'typeorm';
+import { Brackets, EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Post)
 export class PostRepository extends Repository<Post> {
@@ -237,7 +237,6 @@ export class PostRepository extends Repository<Post> {
 
   async interestedPostList(tag_ids: string[]) {}
 
-
   async mainSearch(keywords: string, user_id: number) {
     let main_search = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
@@ -256,9 +255,13 @@ export class PostRepository extends Repository<Post> {
         'post.comment_count',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
-      .orWhere('post.title REGEXP :keywords', { keywords: keywords })
-      .orWhere('post.content REGEXP :keywords', { keywords: keywords })
-      .orWhere('tag.name REGEXP :keywords', { keywords: keywords })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.orWhere('post.title REGEXP :keywords', { keywords: keywords })
+            .orWhere('post.content REGEXP :keywords', { keywords: keywords })
+            .orWhere('tag.name REGEXP :keywords', { keywords: keywords });
+        }),
+      )
       .groupBy('post.id')
       .orderBy('post.id', 'DESC')
       .limit(10000);
