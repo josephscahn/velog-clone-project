@@ -74,30 +74,6 @@ export class LologService {
     return series;
   }
 
-  async getSeriesDetail(
-    user_id: number,
-    series_id: number,
-    sort: string,
-    pagination: PaginationDto,
-  ) {
-    const series = await this.seriesService.selectSeriesDetail(
-      user_id,
-      series_id,
-      sort,
-      pagination,
-    );
-
-    return series;
-  }
-
-  async editSeries(series_id: number, sort) {
-    await this.seriesService.updatePostSeriesSort(series_id, sort);
-  }
-
-  async deleteSeries(seires_id: number, user_id: number) {
-    await this.seriesService.deleteSeries(seires_id);
-  }
-
   async getAboutBlog(user_id: number) {
     return await this.userService.selectAboutBlog(user_id);
   }

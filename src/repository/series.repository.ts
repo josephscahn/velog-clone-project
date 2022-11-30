@@ -1,8 +1,28 @@
+import { SelectSereisPostsDto } from 'src/dto/series/select-series-posts.dto';
 import { Series } from 'src/entity/series.entity';
+import { SeriesSort } from 'src/series/series.model';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Series)
 export class SeriesRepository extends Repository<Series> {
+  async selectSeriesList(user_id: number) {
+    const series = this.createQueryBuilder('series')
+      .leftJoin('series.post_series', 'post_series')
+      .leftJoin('post', 'post', 'post_series.post_id = post.id')
+      .where('series.user_id = :user_id', { user_id: user_id })
+      .select([
+        'series.id AS series_id',
+        'series.thumbnail',
+        'series.series_name',
+        'series.post_count',
+        'series.create_at',
+      ])
+      .groupBy('series.id')
+      .orderBy('series.create_at', 'ASC');
+
+    return await series.getRawMany();
+  }
+
   async createSeries(user_id: number, series_name: string) {
     const series = this.create({
       series_name: series_name,
@@ -17,41 +37,12 @@ export class SeriesRepository extends Repository<Series> {
     }
   }
 
-  async updateSeriesPostCount(user_id: number) {
-    await this.query(
-      `UPDATE series SET post_count = (SELECT COUNT(*) FROM post_series WHERE series_id = series.id)
-      WHERE user_id = ?`,
-      [user_id],
-    );
-  }
-
-  async selectSeriesList(user_id: number) {
-    const series = this.createQueryBuilder('series')
-      .leftJoin('series.post_series', 'post_series')
-      .leftJoin('post', 'post', 'post_series.post_id = post.id')
-      .where('series.user_id = :user_id', { user_id: user_id })
-      .andWhere('post_series.sort = 1')
-      .select([
-        'series.id AS series_id',
-        'post.thumbnail',
-        'series.series_name',
-        'series.post_count',
-        'series.create_at',
-      ])
-      .groupBy('series.id')
-      .orderBy('series.create_at', 'ASC');
-
-    return await series.getRawMany();
-  }
-
-  async selectSeriesDetail(
+  async SelectSereisPosts(
     user_id: number,
     series_id: number,
-    sort: string,
-    offset: number,
-    limit: number,
+    sort: SeriesSort,
   ) {
-    const series = this.createQueryBuilder('series')
+    const series_posts = this.createQueryBuilder('series')
       .leftJoin('series.post_series', 'post_series')
       .leftJoin('post', 'post', 'post_series.post_id = post.id')
       .where('series.user_id = :user_id', { user_id: user_id })
@@ -61,25 +52,22 @@ export class SeriesRepository extends Repository<Series> {
         'series.user_id AS user_id',
         'post.id AS post_id',
         'post_series.sort',
-        'post.thumbnail',
+        'series.thumbnail',
         'post.title',
         'post.content',
         'post.create_at',
       ]);
 
     switch (sort) {
-      case 'asc':
-        series.orderBy('post_series.sort', 'ASC');
+      case SeriesSort.ASC:
+        series_posts.orderBy('post_series.sort', 'ASC');
         break;
-      case 'desc':
-        series.orderBy('post_series.sort', 'DESC');
+      case SeriesSort.DESC:
+        series_posts.orderBy('post_series.sort', 'DESC');
         break;
     }
 
-    series.offset(offset * limit - limit);
-    series.limit(limit);
-
-    return await series.getRawMany();
+    return await series_posts.getRawMany();
   }
 
   async deleteSeries(seires_id: number) {

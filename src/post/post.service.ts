@@ -5,9 +5,7 @@ import { User } from 'src/entity/user.entity';
 import { PostRepository } from 'src/repository/post.repository';
 import { SeriesService } from 'src/series/series.service';
 import { TagService } from 'src/tag/tag.service';
-import { getImageURL, deleteImageFile } from 'src/lib/multerOptions';
 import { PaginationDto } from 'src/dto/pagination.dto';
-import { CommentService } from 'src/comment/comment.service';
 
 /**
  * @todo 게시글 삭제 시에 tag 테이블의 post_count 관련 기능은 추후 구현할 예정..
@@ -96,7 +94,7 @@ export class PostService {
 
     if (!data.series_id) {
       // 시리즈에서 제외 시켰을 경우 post_series 테이블에 삭제되어야 함.
-      await this.seriesService.deletePostSeries(post_id, user.id, 0);
+      await this.seriesService.deletePostSeries(post_id, null);
     } else {
       await this.seriesService.createPostSeries(
         post_id,
@@ -142,14 +140,6 @@ export class PostService {
     }
 
     return posts;
-  }
-
-  async createSeries(user_id: number, series_name: string) {
-    return this.seriesService.createSeries(user_id, series_name);
-  }
-
-  async getSeriesList(user_id: number) {
-    return this.seriesService.selectSeriesList(user_id);
   }
 
   async selectPostListForMain(type: string, period: string) {

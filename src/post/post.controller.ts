@@ -17,7 +17,6 @@ import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { User } from 'src/entity/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
-import { CreateSeriesDto } from 'src/dto/series/create-series.dto';
 import { PaginationDto } from 'src/dto/pagination.dto';
 
 @Controller('posts')
@@ -107,22 +106,5 @@ export class PostController {
     }
 
     return { statusCode: 200, message: 'post delete success' };
-  }
-
-  @Post('/series')
-  async createSeries(@GetUser() user: User, @Body() data: CreateSeriesDto) {
-    const result = await this.postService.createSeries(
-      user.id,
-      data.series_name,
-    );
-
-    return { statusCode: 200, series: result };
-  }
-
-  @Get('/series')
-  async getSeriesList(@GetUser() user: User) {
-    const result = await this.postService.getSeriesList(user.id);
-
-    return { statusCode: 200, series: result };
   }
 }

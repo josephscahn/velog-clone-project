@@ -22,6 +22,9 @@ export class Series {
   @Column()
   series_name: string;
 
+  @Column({ nullable: true })
+  thumbnail: string;
+
   @Column({ default: 0 })
   post_count: number;
 

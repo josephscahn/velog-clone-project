@@ -3,6 +3,17 @@ import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(PostSeries)
 export class PostSeriesRepository extends Repository<PostSeries> {
+  async updatePostSeriesSort(series_id: number, post_id: number, sort: number) {
+    await this.createQueryBuilder()
+      .update(PostSeries)
+      .set({
+        sort: sort,
+      })
+      .where('series_id = :series_id', { series_id: series_id })
+      .andWhere('post_id = :post_id', { post_id: post_id })
+      .execute();
+  }
+
   async selectPostSeriesSort(series_id: number) {
     const sort = await this.findOne(series_id);
 
@@ -27,13 +38,10 @@ export class PostSeriesRepository extends Repository<PostSeries> {
   async deletePostSeries(post_id: number, series_id: number) {
     const post_series = this.createQueryBuilder().delete().from(PostSeries);
 
-    if (post_id > 0) {
-      post_series.where(`post_id = :post_id`, { post_id: post_id });
-    }
+    if (post_id) post_series.where(`post_id = :post_id`, { post_id: post_id });
 
-    if (series_id > 0) {
+    if (series_id)
       post_series.where('series_id = :series_id', { series_id: series_id });
-    }
 
     await post_series.execute();
   }
@@ -52,16 +60,5 @@ export class PostSeriesRepository extends Repository<PostSeries> {
     );
 
     return post_series;
-  }
-
-  async updatePostSeriesSort(series_id: number, post_id: number, sort: number) {
-    await this.createQueryBuilder()
-      .update(PostSeries)
-      .set({
-        sort: sort,
-      })
-      .where('series_id = :series_id', { series_id: series_id })
-      .andWhere('post_id = :post_id', { post_id: post_id })
-      .execute();
   }
 }

@@ -35,44 +35,6 @@ export class LologController {
     return { statusCode: 200, about: result };
   }
 
-  @Get('/:user_id/series/:series_id')
-  async getSeriesDetail(
-    @Param('user_id') user_id: number,
-    @Param('series_id') series_id: number,
-    @Query('sort') sort: string,
-    @Query() pagination: PaginationDto,
-  ) {
-    const result = await this.lologService.getSeriesDetail(
-      user_id,
-      series_id,
-      sort,
-      pagination,
-    );
-
-    return { statusCode: 200, series: result };
-  }
-
-  @Patch('/:user_id/series/:series_id')
-  async editSeries(
-    @Param('user_id') user_id: number,
-    @Param('series_id') series_id: number,
-    @Body('sort') sort,
-  ) {
-    await this.lologService.editSeries(series_id, sort);
-
-    return { statusCode: 200, message: 'update seires success' };
-  }
-
-  @Delete('/:user_id/series/:series_id')
-  async deleteSeries(
-    @Param('user_id') user_id: number,
-    @Param('series_id') series_id: number,
-  ) {
-    await this.lologService.deleteSeries(series_id, user_id);
-
-    return { statusCode: 200, message: 'delete seires success' };
-  }
-
   @Get('/:user_id')
   async getInsidePage(
     @Param('user_id') user_id: number,
