@@ -154,16 +154,4 @@ export class PostService {
 
     return posts;
   }
-
-  async thumbnailUpload(files: File[], file_name: string) {
-    if (file_name) deleteImageFile(file_name);
-
-    let url = getImageURL(files);
-
-    return url[0];
-  }
-
-  async thumbnailDelete(file_name: string) {
-    deleteImageFile(file_name);
-  }
 }

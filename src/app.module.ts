@@ -10,6 +10,7 @@ import { SeriesModule } from './series/series.module';
 import { ListsModule } from './lists/lists.module';
 import { MainModule } from './main/main.module';
 import { SearchModule } from './search/search.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SearchModule } from './search/search.module';
     ListsModule,
     MainModule,
     SearchModule,
+    UploadModule,
   ],
   providers: [],
   controllers: [],

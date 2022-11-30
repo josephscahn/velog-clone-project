@@ -10,8 +10,6 @@ import {
   Query,
   BadRequestException,
   NotFoundException,
-  UseInterceptors,
-  UploadedFiles,
 } from '@nestjs/common';
 import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { PostService } from './post.service';
@@ -20,8 +18,6 @@ import { User } from 'src/entity/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { CreateSeriesDto } from 'src/dto/series/create-series.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { multerOptions } from 'src/lib/multerOptions';
 import { PaginationDto } from 'src/dto/pagination.dto';
 
 @Controller('posts')
@@ -67,31 +63,6 @@ export class PostController {
       next_post: result.post.next_post[0],
       pre_post: result.post.pre_post[0],
       interested: result.post.interested_posts[0],
-    };
-  }
-
-  @UseInterceptors(FilesInterceptor('image', 1, multerOptions))
-  @Post('/thumbnail')
-  async thumbnailUpload(
-    @UploadedFiles() files: File[],
-    @Body('file_name') file_name: string,
-  ) {
-    const result = await this.postService.thumbnailUpload(files, file_name);
-
-    return {
-      statusCode: 200,
-      message: 'thumbnail upload success',
-      imageUrl: result,
-    };
-  }
-
-  @Delete('/thumbnail')
-  thumbnailDelete(@Body('file_name') file_name: string) {
-    this.postService.thumbnailDelete(file_name);
-
-    return {
-      statusCode: 200,
-      message: 'thumbnail delete success',
     };
   }
 
