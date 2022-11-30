@@ -5,23 +5,29 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { ValidateToken } from 'src/custom-decorator/validate-token.decorator';
 import { PaginationDto } from 'src/dto/pagination.dto';
+import { User } from 'src/entity/user.entity';
 import { SearchService } from './search.service';
 
 @Controller('search')
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
-  @Get('/main')
+  @Get()
   @UsePipes(ValidationPipe)
   async mainSearch(
     @Query('keyword') keyword: string,
     @Query('userId') user_id: number,
-    @Query() pagination: PaginationDto,
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
+    @ValidateToken() user: User,
   ) {
+    const pagination: PaginationDto = { offset: offset, limit: limit };
     const data = await this.searchService.mainSearch(
       keyword,
       user_id,
+      user,
       pagination,
     );
     return data;

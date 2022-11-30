@@ -74,10 +74,11 @@ export class UserRepository extends Repository<User> {
   async getMe(id: number) {
     return await this.query(
       `
-        SELECT u.id, u.profile_image, u.name, u.about_me, u.title, u.email, u.comment_alert, u.update_alert, si.email social_info_email, si.github social_info_github, si. twitter social_info_twitter, si.facebook social_info_facebook, si.url social_info_url
-          FROM user u
-          LEFT JOIN social_info si ON si.userId = u.id
-          WHERE u.id = ?;
+      SELECT count(follow.id) as followCount, u.id, u.profile_image, u.name, u.about_me, u.title, u.email, u.comment_alert, u.update_alert, si.email social_info_email, si.github social_info_github, si. twitter social_info_twitter, si.facebook social_info_facebook, si.url social_info_url
+        FROM user u
+        LEFT JOIN social_info si ON si.userId = u.id
+        LEFT JOIN follow ON u.id = follow.followee_id
+        WHERE u.id = ?;
       `,
       [id],
     );

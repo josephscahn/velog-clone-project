@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PaginationDto } from 'src/dto/pagination.dto';
+import { User } from 'src/entity/user.entity';
 import { PostRepository } from 'src/repository/post.repository';
 
 @Injectable()
@@ -9,12 +10,14 @@ export class SearchService {
   async mainSearch(
     keyword: string,
     user_id: number,
+    user: User,
     pagination: PaginationDto,
   ) {
     let keywords: string = keyword.split(' ').join('|');
     const searchPosts = await this.postRepository.mainSearch(
       keywords,
       user_id,
+      user,
       pagination.offset,
       pagination.limit,
     );

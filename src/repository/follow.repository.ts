@@ -45,4 +45,25 @@ export class FollowRepository extends Repository<Follow> {
       [id],
     );
   }
+
+  async getFolloweePosts(id: number) {
+    return await this.createQueryBuilder('follow')
+      .leftJoin('user', 'user', 'follow.followee_id = user.id')
+      .leftJoin('post', 'post', 'follow.followee_id = post.user_id')
+      .leftJoin('post.tags', 'tags')
+      .select([
+        'user.id AS user_id',
+        'user.profile_image',
+        'user.login_id',
+        'post.id AS post_id',
+        'post.thumbnail',
+        'post.title',
+        'post.content',
+        'post.create_at',
+        'post.comment_count',
+        'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
+      ])
+      .where('follow.follower_id = :id', { id: id })
+      .getRawMany();
+  }
 }

@@ -98,6 +98,14 @@ export class UserService {
     return returnData;
   }
 
+  async getFolloweePosts(id: number) {
+    const data = await this.followRepository.getFolloweePosts(id);
+    for (let i = 0; i < data.length; i++) {
+      data[i].tags = JSON.parse(data[i].tags);
+    }
+    return data;
+  }
+
   async getMe(id: number) {
     return await this.userRepository.getMe(id);
   }

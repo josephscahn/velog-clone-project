@@ -91,10 +91,7 @@ export class PostController {
       statusCode: 200,
       message: 'post update success',
       series: result.series[0],
-      post: result.post.post[0],
-      next_post: result.post.next_post[0],
-      pre_post: result.post.pre_post[0],
-      interested: result.post.interested_posts[0],
+      post: result.post[0],
     };
   }
 

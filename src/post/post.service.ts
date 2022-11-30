@@ -48,14 +48,19 @@ export class PostService {
     return { post, create_post, series };
   }
 
-  async selectPostOne(user_id: number, post_id: number) {
-    const post = await this.postRepository.selectPostOne(user_id, post_id);
+  async selectPostOne(user_id: number, post_id: number, user?: User) {
+    const post = await this.postRepository.selectPostOne(
+      user_id,
+      post_id,
+      user,
+    );
+    if (post !== 0) {
+      for (let i = 0; i < post.length; i++) {
+        if (post[i].tags) {
+          const to_json = JSON.parse(post[i].tags);
 
-    for (let i = 0; i < post.length; i++) {
-      if (post[i].tags) {
-        const to_json = JSON.parse(post[i].tags);
-
-        post[i].tags = to_json;
+          post[i].tags = to_json;
+        }
       }
     }
 
@@ -75,7 +80,7 @@ export class PostService {
     data: UpdatePostDto,
     post_id: number,
     status: number,
-  ) {
+  ): Promise<any> {
     await this.postRepository.selectPostOne(user.id, post_id);
     const update_post = await this.postRepository.updatePost(
       user,

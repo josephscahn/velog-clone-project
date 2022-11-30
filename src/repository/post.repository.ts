@@ -6,42 +6,39 @@ import { Brackets, EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Post)
 export class PostRepository extends Repository<Post> {
-  async selectPostOne(user_id: number, post_id: number) {
-    const post = await this.query(
-      `WITH tags AS (
-        SELECT 
-        post.id AS post_id,
-        JSON_ARRAYAGG(
-          JSON_OBJECT(
-            'tag_id', tag.id,
-            'tag_name', tag.name
-          )
-        ) AS tags
-        FROM post
-        LEFT JOIN post_tag pt ON pt.post_id = post.id
-        LEFT JOIN tag ON tag.id = pt.tag_id
-        GROUP BY post.id
-        )
-        
-        SELECT
-        user.id AS user_id,
-        user.login_id,
-        user.name,
-        user.profile_image,
-        user.about_me,
-        post.id,
-        post.title,
-        post.status,
-        post.content,
-        IF(INSTR(tags.tags,'"tag_id": null'), null, tags.tags) AS  tags,
-        post.comment_count,
-        IF(user_id = ?, 1, 0) AS is_writer
-        FROM post
-        LEFT JOIN user ON user.id = post.user_id
-        LEFT JOIN tags ON tags.post_id = post.id
-        WHERE user.id = ? AND post.id = ?`,
-      [user_id, user_id, post_id],
-    );
+  async selectPostOne(user_id: number, post_id: number, user?: User) {
+    let query = this.createQueryBuilder('post')
+      .leftJoin('post.user', 'user')
+      .leftJoin('post.tags', 'tags')
+      .select([
+        'user.id AS user_id',
+        'user.login_id',
+        'user.name',
+        'user.profile_image',
+        'user.about_me',
+        'post.id AS post_id',
+        'post.title',
+        'post.status',
+        'post.content',
+        'post.create_at',
+        'post.comment_count',
+        'post.likes',
+        'IF(post.user_id = :userId, 1, 0) AS is_writer',
+        'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
+      ])
+      .setParameter('userId', user_id)
+      .andWhere('user.id = :user_id', { user_id: user_id })
+      .andWhere('post.id = :post_id', { post_id: post_id });
+
+    if (user) {
+      console.log(user);
+      query
+        .addSelect([
+          'EXISTS (SELECT * FROM follow WHERE follow.follower_id = :id AND follow.followee_id = post.user_id) AS IsFollower',
+        ])
+        .setParameter('id', user['sub']);
+    }
+    const post = await query.getRawMany();
 
     if (post.length <= 0) return 0;
 
@@ -277,7 +274,8 @@ export class PostRepository extends Repository<Post> {
 
   async mainSearch(
     keywords: string,
-    user_id: number,
+    userId: number,
+    user: User,
     offset: number,
     limit: number,
   ) {
@@ -308,8 +306,16 @@ export class PostRepository extends Repository<Post> {
       .groupBy('post.id')
       .orderBy('post.id', 'DESC');
 
-    if (user_id) {
-      main_search.andWhere('post.user_id = :user_id', { user_id: user_id });
+    if (userId) {
+      main_search.andWhere('post.user_id = :userId', { userId: userId });
+    }
+
+    if (user) {
+      main_search
+        .addSelect([
+          'EXISTS (SELECT * FROM follow WHERE follow.follower_id = :user_id AND follow.followee_id = post.user_id) AS IsFollower',
+        ])
+        .setParameter('user_id', user['sub']);
     }
 
     main_search.offset(offset * limit - limit);

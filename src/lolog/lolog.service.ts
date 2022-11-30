@@ -44,7 +44,7 @@ export class LologService {
   }
 
   async getPostDetail(user_id: number, post_id: number, user?: User) {
-    const post = await this.postService.selectPostOne(user_id, post_id);
+    const post = await this.postService.selectPostOne(user_id, post_id, user);
     const comments = await this.commentService.selectCommentList(
       post_id,
       user_id,
@@ -57,7 +57,7 @@ export class LologService {
         post_id,
       );
 
-      if (exist[0].exist === '0' && post.post.user_id !== user['sub']) {
+      if (exist[0].exist === '0' && post.post['user_id'] !== user['sub']) {
         await this.postReadLogRepository.createReadLog(user['sub'], post_id);
       }
     }

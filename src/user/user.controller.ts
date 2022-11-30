@@ -178,6 +178,14 @@ export class UserController {
     return { follow };
   }
 
+  @Get('/follow/post')
+  @UseGuards(JwtAuthGuard)
+  async getFolloweePosts(@GetUser() user: User) {
+    const id = user.id;
+    const posts = await this.userService.getFolloweePosts(id);
+    return { posts };
+  }
+
   @Get()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
