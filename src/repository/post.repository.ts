@@ -185,13 +185,6 @@ export class PostRepository extends Repository<Post> {
     return pre_post;
   }
 
-  async updateCommentCount(post_id: number) {
-    await this.query(
-      `UPDATE post SET comment_count = (SELECT COUNT(*) FROM comments WHERE post_id = ?) WHERE id = ?`,
-      [post_id, post_id],
-    );
-  }
-
   async updateLikeCount(post_id: number) {
     await this.query(
       `UPDATE post SET likes = (SELECT COUNT(*) FROM post_like WHERE post_id = ?) WHERE id = ?`,

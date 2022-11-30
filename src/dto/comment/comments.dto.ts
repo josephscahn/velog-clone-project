@@ -9,17 +9,10 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class CommentDto {
+export class CommentsDto {
   @IsString()
   @IsNotEmpty()
   content: string;
-
-  @IsOptional()
-  @IsNumber()
-  @IsNotEmpty()
-  @Min(0)
-  @Max(1)
-  depth: number;
 
   @IsOptional()
   @IsNumber()

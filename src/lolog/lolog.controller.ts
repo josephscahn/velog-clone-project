@@ -64,12 +64,12 @@ export class LologController {
 
     return {
       statusCode: 200,
-      series: result.series[0],
+      series: result.series,
       post: result.post.post[0],
       next_post: result.post.next_post[0],
       pre_post: result.post.pre_post[0],
-      comments: result.comments[0],
-      interested: result.post.interested_posts[0],
+      comments: result.comments,
+      interested: result.post.interested_posts,
     };
   }
 
