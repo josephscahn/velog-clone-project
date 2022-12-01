@@ -11,7 +11,6 @@ import { Comments } from './comment.entity';
         'comment_profile_image', user.profile_image,
         'comment_id', child.id,
         'content', child.content,
-        'depth', child.depth,
         'create_at', child.create_at,
         'is_comments_writer', IF(user.id = 1, 'true', 'false')
       )

@@ -36,41 +36,14 @@ export class LologController {
   }
 
   @Get('/:user_id')
-  async getInsidePage(
+  async getLolog(
     @Param('user_id') user_id: number,
-    @Query('tag_id') tag_id: number,
     @Query() pagination: PaginationDto,
-  ) {
-    const result = await this.lologService.getInsidePage(
-      user_id,
-      tag_id,
-      pagination,
-    );
-
-    return { statusCode: 200, posts: result.posts, tags: result.tags };
-  }
-
-  @Get('/:user_id/:post_id')
-  async getPostDetail(
-    @Param('user_id') user_id: number,
-    @Param('post_id') post_id: number,
     @ValidateToken() user?: User,
   ) {
-    const result = await this.lologService.getPostDetail(
-      user_id,
-      post_id,
-      user,
-    );
+    const result = await this.lologService.getLolog(user_id, pagination, user);
 
-    return {
-      statusCode: 200,
-      series: result.series,
-      post: result.post.post[0],
-      next_post: result.post.next_post[0],
-      pre_post: result.post.pre_post[0],
-      comments: result.comments,
-      interested: result.post.interested_posts,
-    };
+    return { statusCode: 200, posts: result.posts, tags: result.tags };
   }
 
   @Patch('/:user_id/about')

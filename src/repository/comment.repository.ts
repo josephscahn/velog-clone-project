@@ -15,11 +15,10 @@ export class CommentRepository extends Repository<Comments> {
         'user.login_id AS comment_login_id',
         'user.profile_image AS comment_profile_image',
         'comments.id AS comment_id',
-        'comments.content',
-        'comments.depth',
-        'comments.create_at',
+        'comments.content as content',
+        'comments.create_at as create_at',
         'nested_comments.nested_comments as nested_comments',
-        'IF(user.id = :user_id, 1, 0) AS is_comments_write',
+        'IF(user.id = :user_id, 1, 0) AS is_comments_writer',
       ])
       .setParameter('user_id', user_id)
       .where('post.id = :post_id', { post_id: post_id })

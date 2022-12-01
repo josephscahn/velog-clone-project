@@ -15,24 +15,24 @@ export class PostSeriesRepository extends Repository<PostSeries> {
   }
 
   async selectPostSeriesSort(series_id: number) {
-    const sort = await this.findOne(series_id);
-
-    return sort;
-  }
-
-  async createPostSeries(post_id: number, series_id: number, sort: number) {
-    const post_series = this.create({
-      post: post_id,
-      series: series_id,
-      sort: sort,
-    });
+    const sort = await this.createQueryBuilder('post_series')
+      .where('series_id = :series_id', { series_id: series_id })
+      .select(['sort'])
+      .orderBy('sort', 'DESC')
+      .limit(1);
 
     try {
-      await this.save(post_series);
-      return 1;
+      return await sort.getRawMany();
     } catch (error) {
       return 0;
     }
+  }
+
+  async createPostSeries(post_id: number, series_id: number) {
+    this.query(
+      `INSERT INTO post_series(sort, series_id, post_id) VALUES (get_post_series_sort(?), ?, ?);`,
+      [series_id, series_id, post_id],
+    );
   }
 
   async deletePostSeries(post_id: number, series_id: number) {

@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  Min,
+  Max,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreatePostDto {
   @IsString()
@@ -12,11 +20,20 @@ export class CreatePostDto {
   @IsString()
   thumbnail: string;
 
-  @IsOptional()
   @IsString({ each: true })
   readonly tags: string[];
+
+  @IsNumber()
+  @Min(1)
+  @Max(3)
+  @Type(() => Number)
+  status: number;
 
   @IsOptional()
   @IsNumber()
   series_id: number;
+
+  @IsOptional()
+  @IsString()
+  post_url: string;
 }

@@ -6,7 +6,33 @@ import { Brackets, EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Post)
 export class PostRepository extends Repository<Post> {
-  async selectPostOne(user_id: number, post_id: number, user?: User) {
+  async createPost(
+    user: User,
+    title: string,
+    content: string,
+    status: number,
+    thumbnail: string,
+    post_url: string,
+  ) {
+    const post = this.create({
+      title: title,
+      content: content,
+      status: status,
+      thumbnail: thumbnail,
+      post_url: post_url,
+      user: user,
+    });
+
+    try {
+      await this.save(post);
+
+      return post.id;
+    } catch (err) {
+      return 0;
+    }
+  }
+
+  async selectPostOne(login_user_id: number, post_id: number) {
     let query = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
       .leftJoin('post.tags', 'tags')
@@ -26,18 +52,17 @@ export class PostRepository extends Repository<Post> {
         'IF(post.user_id = :userId, 1, 0) AS is_writer',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
-      .setParameter('userId', user_id)
-      .andWhere('user.id = :user_id', { user_id: user_id })
+      .setParameter('userId', login_user_id)
       .andWhere('post.id = :post_id', { post_id: post_id });
 
-    if (user) {
-      console.log(user);
+    if (login_user_id > -1) {
       query
         .addSelect([
           'EXISTS (SELECT * FROM follow WHERE follow.follower_id = :id AND follow.followee_id = post.user_id) AS IsFollower',
         ])
-        .setParameter('id', user['sub']);
+        .setParameter('id', login_user_id);
     }
+
     const post = await query.getRawMany();
 
     if (post.length <= 0) return 0;
@@ -45,36 +70,13 @@ export class PostRepository extends Repository<Post> {
     return post;
   }
 
-  async createPost(user: User, data: CreatePostDto, status: number) {
-    const post = this.create({
-      title: data.title,
-      content: data.content,
-      status: status,
-      thumbnail: data.thumbnail,
-      user: user,
-    });
-
-    try {
-      await this.save(post);
-
-      return post.id;
-    } catch (err) {
-      return 0;
-    }
-  }
-
-  async updatePost(
-    user: User,
-    data: UpdatePostDto,
-    post_id: number,
-    status: number,
-  ) {
+  async updatePost(user: User, data: UpdatePostDto, post_id: number) {
     const post = this.createQueryBuilder()
       .update(Post)
       .set({
         title: data.title,
         content: data.content,
-        status: status,
+        status: data.status,
         thumbnail: data.thumbnail,
       })
       .where(`id = :post_id AND user_id = :user_id`, {
@@ -109,9 +111,8 @@ export class PostRepository extends Repository<Post> {
 
   async selectPostList(
     user_id: number,
-    is_writer: boolean,
+    is_owner: boolean,
     tag_id: number,
-    saves: boolean,
     offset: number,
     limit: number,
   ) {
@@ -135,26 +136,35 @@ export class PostRepository extends Repository<Post> {
       .groupBy('post.id')
       .orderBy('post.create_at', 'DESC');
 
-    if (saves) {
-      posts.andWhere('post.status = 3');
-    }
-
-    if (is_writer && !saves) {
+    if (is_owner) {
       posts.andWhere("post.status REGEXP '1|2'");
-    }
-
-    if (!is_writer && !saves) {
+    } else {
       posts.andWhere('post.status = 1');
     }
 
-    if (tag_id) {
-      posts.andWhere('post_tag.tag_id = :tag_id', { tag_id: tag_id });
-    }
+    if (tag_id) posts.andWhere('post_tag.tag_id = :tag_id', { tag_id: tag_id });
 
     posts.offset(offset * limit - limit);
     posts.limit(limit);
 
     return await posts.getRawMany();
+  }
+
+  async selectSaves(user_id: number) {
+    const saves = this.createQueryBuilder('post')
+      .leftJoin('post.user', 'user')
+      .select([
+        'post.id AS post_id',
+        'user.id AS user_id',
+        'post.title AS title',
+        'post.content AS content',
+        'post.create_at AS create_at',
+      ])
+      .where('user.id = :user_id', { user_id: user_id })
+      .andWhere('post.status = 3')
+      .orderBy('post.create_at', 'DESC');
+
+    return await saves.getRawMany();
   }
 
   async selectNextPost(post_id: number, user_id: number) {

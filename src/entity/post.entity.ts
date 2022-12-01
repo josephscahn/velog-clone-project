@@ -41,6 +41,9 @@ export class Post extends BaseEntity {
   @Column({ default: 0 })
   comment_count: number;
 
+  @Column()
+  post_url: string;
+
   @CreateDateColumn()
   create_at: Date;
 

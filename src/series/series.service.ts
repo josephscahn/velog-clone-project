@@ -68,16 +68,17 @@ export class SeriesService {
   }
 
   async createPostSeries(post_id: number, series_id: number, user_id: number) {
-    const get_sort = await this.postSeriesRepository.selectPostSeriesSort(
-      series_id,
-    );
+    // const get_sort = await this.postSeriesRepository.selectPostSeriesSort(
+    //   series_id,
+    // );
 
-    let sort = 1;
-    if (get_sort) {
-      sort = get_sort.sort + 1;
-    }
+    // let sort = 1;
 
-    await this.postSeriesRepository.createPostSeries(post_id, series_id, sort);
+    // if (get_sort[0].sort != 0) {
+    //   sort = get_sort[0].sort + 1;
+    // }
+
+    await this.postSeriesRepository.createPostSeries(post_id, series_id);
   }
 
   async selectPostSeriesList(post_id: number) {

@@ -1,4 +1,4 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class PaginationDto {
@@ -9,4 +9,9 @@ export class PaginationDto {
   @IsNumber()
   @Type(() => Number)
   limit: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  tag_id: number;
 }
