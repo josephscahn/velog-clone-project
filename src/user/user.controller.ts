@@ -79,6 +79,9 @@ export class UserController {
           break;
 
         case 'alert':
+          if (!(updateUserDto.comment_alert && updateUserDto.update_alert)) {
+            throw new Error('comment_alert && update_alert must be entered');
+          }
           updateData = {
             comment_alert: updateUserDto.comment_alert,
             update_alert: updateUserDto.update_alert,
@@ -96,7 +99,8 @@ export class UserController {
         );
       } else if (
         err.message === 'title must be entered' ||
-        err.message === 'name must be entered'
+        err.message === 'name must be entered' ||
+        err.message === 'comment_alert && update_alert must be entered'
       ) {
         console.log(err);
         throw new BadRequestException(err.message);
@@ -111,7 +115,7 @@ export class UserController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @HttpCode(201)
-  async udpateProfileImage(
+  async updateProfileImage(
     @Body('profile_image') profile_image: string,
     @GetUser() user: User,
   ) {
