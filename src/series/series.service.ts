@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SelectSereisPostsDto } from 'src/dto/series/select-series-posts.dto';
+import { User } from 'src/entity/user.entity';
 import { PostSeriesRepository } from 'src/repository/post-series.repository';
 import { SeriesRepository } from 'src/repository/series.repository';
 
@@ -17,32 +18,29 @@ export class SeriesService {
   }
 
   async createSeries(user_id: number, series_name: string) {
-    const result = await this.seriesRepository.createSeries(
-      user_id,
-      series_name,
-    );
-
-    if (result == 0) return 0;
+    await this.seriesRepository.createSeries(user_id, series_name);
 
     return this.selectSeriesList(user_id);
   }
 
   async SelectSereisPosts(
-    user_id: number,
     series_id: number,
     sort: SelectSereisPostsDto,
+    user?: User,
   ) {
+    let login_user_id = -1;
+
+    if (user != null) {
+      login_user_id = user['sub'];
+    }
+
     const seires_posts = await this.seriesRepository.SelectSereisPosts(
-      user_id,
       series_id,
       sort.sort,
+      login_user_id,
     );
 
-    if (seires_posts[0].user_id == user_id) {
-      seires_posts.push({ is_owner: 1 });
-    } else {
-      seires_posts.push({ is_owner: 0 });
-    }
+    if (seires_posts.length == 0) return null;
 
     return seires_posts;
   }
@@ -57,28 +55,9 @@ export class SeriesService {
     }
   }
 
-  // 게시글 리팩토링 할 때 해당 메서드 삭제할 예정
-  async deletePostSeries(post_id: number, seires_id: number) {
-    await this.postSeriesRepository.deletePostSeries(post_id, seires_id);
-  }
-
   async deleteSeries(seires_id: number) {
     await this.postSeriesRepository.deletePostSeries(null, seires_id);
     await this.seriesRepository.deleteSeries(seires_id);
-  }
-
-  async createPostSeries(post_id: number, series_id: number, user_id: number) {
-    // const get_sort = await this.postSeriesRepository.selectPostSeriesSort(
-    //   series_id,
-    // );
-
-    // let sort = 1;
-
-    // if (get_sort[0].sort != 0) {
-    //   sort = get_sort[0].sort + 1;
-    // }
-
-    await this.postSeriesRepository.createPostSeries(post_id, series_id);
   }
 
   async selectPostSeriesList(post_id: number) {

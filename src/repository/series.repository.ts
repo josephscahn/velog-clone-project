@@ -1,4 +1,3 @@
-import { SelectSereisPostsDto } from 'src/dto/series/select-series-posts.dto';
 import { Series } from 'src/entity/series.entity';
 import { SeriesSort } from 'src/series/series.model';
 import { EntityRepository, Repository } from 'typeorm';
@@ -29,24 +28,18 @@ export class SeriesRepository extends Repository<Series> {
       user: user_id,
     });
 
-    try {
-      await this.save(series);
-      return series.id;
-    } catch (error) {
-      return 0;
-    }
+    await this.save(series);
   }
 
   async SelectSereisPosts(
-    user_id: number,
     series_id: number,
     sort: SeriesSort,
+    login_user_id: number,
   ) {
     const series_posts = this.createQueryBuilder('series')
       .leftJoin('series.post_series', 'post_series')
       .leftJoin('post', 'post', 'post_series.post_id = post.id')
-      .where('series.user_id = :user_id', { user_id: user_id })
-      .andWhere('series.id = :series_id', { series_id: series_id })
+      .where('series.id = :series_id', { series_id: series_id })
       .select([
         'series.id AS series_id',
         'series.user_id AS user_id',
@@ -56,7 +49,9 @@ export class SeriesRepository extends Repository<Series> {
         'post.title',
         'post.content',
         'post.create_at',
-      ]);
+        'IF(series.user_id = :user_id, 1, 0) as is_owner',
+      ])
+      .setParameter('user_id', login_user_id);
 
     switch (sort) {
       case SeriesSort.ASC:

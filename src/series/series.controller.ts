@@ -3,7 +3,6 @@ import {
   UseGuards,
   Post,
   Body,
-  BadRequestException,
   Get,
   Param,
   Query,
@@ -16,25 +15,25 @@ import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { User } from 'src/entity/user.entity';
 import { CreateSeriesDto } from 'src/dto/series/create-series.dto';
 import { SelectSereisPostsDto } from 'src/dto/series/select-series-posts.dto';
+import { ValidateToken } from 'src/custom-decorator/validate-token.decorator';
 
 @Controller('series')
-@UseGuards(JwtAuthGuard)
 export class SeriesController {
   constructor(private readonly seriesService: SeriesService) {}
 
   @Post('')
+  @UseGuards(JwtAuthGuard)
   async createSeries(@GetUser() user: User, @Body() data: CreateSeriesDto) {
     const result = await this.seriesService.createSeries(
       user.id,
       data.series_name,
     );
 
-    if (result == 0) throw new BadRequestException(`create series failed`);
-
     return { statusCode: 200, series: result };
   }
 
   @Get('')
+  @UseGuards(JwtAuthGuard)
   async selectSeriesList(@GetUser() user: User) {
     const result = await this.seriesService.selectSeriesList(user.id);
 
@@ -43,14 +42,14 @@ export class SeriesController {
 
   @Get('/:id')
   async SelectSereisPosts(
-    @GetUser() user: User,
     @Param('id') series_id: number,
     @Query() sort: SelectSereisPostsDto,
+    @ValidateToken() user?: User,
   ) {
     const result = await this.seriesService.SelectSereisPosts(
-      user.id,
       series_id,
       sort,
+      user,
     );
 
     return { statusCode: 200, series: result };
