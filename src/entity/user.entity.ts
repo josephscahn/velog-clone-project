@@ -37,11 +37,11 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   title: string;
 
-  @Column({ default: false })
-  comment_alert: boolean;
+  @Column({ default: 0 })
+  comment_alert: number;
 
-  @Column({ default: false })
-  update_alert: boolean;
+  @Column({ default: 0 })
+  update_alert: number;
 
   @Column({ nullable: true })
   provider: string;

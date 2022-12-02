@@ -38,10 +38,10 @@ export class UpdateUserDto {
   social_info_url?: string;
 
   @IsBooleanOrNull({ message: 'comment_alert must be a 1 or 0 or Null' })
-  comment_alert?: boolean;
+  comment_alert?: number;
 
   @IsBooleanOrNull({ message: 'update_alert must be a 1 or 0 or Null' })
-  update_alert?: boolean;
+  update_alert?: number;
 }
 
 export class SocialInfoDto extends PickType(UpdateUserDto, [

@@ -23,7 +23,11 @@ export class SearchController {
     @Query('limit') limit: number,
     @ValidateToken() user: User,
   ) {
-    const pagination: PaginationDto = { offset: offset, limit: limit };
+    const pagination: PaginationDto = {
+      offset: offset,
+      limit: limit,
+      tag_id: null,
+    };
     const data = await this.searchService.mainSearch(
       keyword,
       user_id,

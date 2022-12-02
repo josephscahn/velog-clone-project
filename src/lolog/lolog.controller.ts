@@ -63,7 +63,7 @@ export class LologController {
   @UseGuards(JwtAuthGuard)
   async likePost(@Param('post_id') post_id: number, @GetUser() user: User) {
     await this.lologService.likePost(user.id, post_id);
-    return { statusCode: 200 };
+    return { statusCode: 201 };
   }
 
   @Delete('/:post_id/like')

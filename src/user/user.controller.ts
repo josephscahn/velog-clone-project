@@ -34,7 +34,7 @@ export class UserController {
     @Query('type') type: string,
     @GetUser() user: User,
   ) {
-    // type: [title, name, profile_image, social_info]
+    // type: [title, name, social_info]
     const id = user.id;
     try {
       let data: any = '';
@@ -73,13 +73,13 @@ export class UserController {
           data = await this.userService.updateUser(id, updateData);
           break;
 
-        case 'profile_image':
-          updateData = { profile_image: updateUserDto.profile_image };
-          data = await this.userService.updateUser(id, updateData);
-          break;
-
         case 'alert':
-          if (!(updateUserDto.comment_alert && updateUserDto.update_alert)) {
+          if (
+            !(
+              updateUserDto.comment_alert in [0, 1] &&
+              updateUserDto.update_alert in [0, 1]
+            )
+          ) {
             throw new Error('comment_alert && update_alert must be entered');
           }
           updateData = {
