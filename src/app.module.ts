@@ -11,6 +11,8 @@ import { ListsModule } from './lists/lists.module';
 import { MainModule } from './main/main.module';
 import { SearchModule } from './search/search.module';
 import { UploadModule } from './upload/upload.module';
+import { GlobalExceptionFilter } from './exception/globalExceptionFilter';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -27,7 +29,13 @@ import { UploadModule } from './upload/upload.module';
     SearchModule,
     UploadModule,
   ],
-  providers: [],
+  // providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
   controllers: [],
 })
 export class AppModule {}

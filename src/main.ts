@@ -7,11 +7,14 @@ import { ConfigService } from 'config/config.service';
 import * as fs from 'fs';
 import * as express from 'express';
 import { join } from 'path';
+import { GlobalExceptionFilter } from './exception/globalExceptionFilter';
 
 async function bootstrap() {
   await makeOrmConfig();
 
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({

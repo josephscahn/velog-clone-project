@@ -7,10 +7,10 @@ import { CommentRepository } from 'src/repository/comment.repository';
 export class CommentService {
   constructor(private commentRepository: CommentRepository) {}
 
-  async selectCommentList(post_id: number, user_id: number) {
+  async selectCommentList(post_id: number, login_user_id: number) {
     let result = await this.commentRepository.selectCommentList(
       post_id,
-      user_id,
+      login_user_id,
     );
 
     for (let i = 0; i < result.length; i++) {
@@ -27,13 +27,7 @@ export class CommentService {
   }
 
   async createComment(data: CommentsDto, post_id: number, user_id: number) {
-    const result = await this.commentRepository.createComment(
-      data,
-      post_id,
-      user_id,
-    );
-
-    if (result == 0) return 0;
+    await this.commentRepository.createComment(data, post_id, user_id);
 
     const comments = await this.selectCommentList(post_id, user_id);
     return comments;
@@ -44,13 +38,11 @@ export class CommentService {
     params: CommentsParamDto,
     data: CommentsDto,
   ) {
-    const result = await this.commentRepository.updateComment(
+    await this.commentRepository.updateComment(
       data,
       params.comment_id,
       user_id,
     );
-
-    if (result == 0) return 0;
 
     const comments = await this.selectCommentList(params.post_id, user_id);
 
@@ -58,12 +50,7 @@ export class CommentService {
   }
 
   async deleteComment(user_id: number, params: CommentsParamDto) {
-    const result = await this.commentRepository.deleteComment(
-      params.comment_id,
-      user_id,
-    );
-
-    if (result == 0) return 0;
+    await this.commentRepository.deleteComment(params.comment_id, user_id);
 
     const comments = await this.selectCommentList(params.post_id, user_id);
 

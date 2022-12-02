@@ -22,9 +22,6 @@ export class Comments extends BaseEntity {
   @Column()
   content: string;
 
-  @Column()
-  depth: number;
-
   @CreateDateColumn()
   create_at: Date;
 

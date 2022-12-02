@@ -15,7 +15,15 @@ import { Comments } from './comment.entity';
         'is_comments_writer', IF(user.id = 1, 'true', 'false')
       )
   ) AS nested_comments
-  FROM comments child
+  FROM (SELECT
+    ROW_NUMBER() OVER(ORDER BY create_at DESC) as rownum, 
+    id, 
+    user_id, 
+    content,
+    create_at, 
+    parent_id 
+    FROM comments
+    ORDER BY create_at DESC) as child
   INNER JOIN comments parent ON parent.id = child.parent_id
   LEFT JOIN user ON user.id = child.user_id
   GROUP BY parent.id

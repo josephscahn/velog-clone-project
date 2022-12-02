@@ -4,7 +4,7 @@ import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Comments)
 export class CommentRepository extends Repository<Comments> {
-  async selectCommentList(post_id: number, user_id: number) {
+  async selectCommentList(post_id: number, login_user_id: number) {
     const comments = this.createQueryBuilder('comments')
       .leftJoin('post', 'post', 'post.id = comments.post_id')
       .leftJoin('comments.user', 'user')
@@ -20,8 +20,9 @@ export class CommentRepository extends Repository<Comments> {
         'nested_comments.nested_comments as nested_comments',
         'IF(user.id = :user_id, 1, 0) AS is_comments_writer',
       ])
-      .setParameter('user_id', user_id)
+      .setParameter('user_id', login_user_id)
       .where('post.id = :post_id', { post_id: post_id })
+      .andWhere('comments.parent_id IS NULL')
       .orderBy('comments.create_at', 'DESC');
 
     return await comments.getRawMany();
@@ -35,12 +36,7 @@ export class CommentRepository extends Repository<Comments> {
       comment: data.parent_id,
     });
 
-    try {
-      await this.save(comment);
-      return 1;
-    } catch (err) {
-      return 0;
-    }
+    await this.save(comment);
   }
 
   async updateComment(data: CommentsDto, comment_id: number, user_id: number) {
@@ -54,12 +50,7 @@ export class CommentRepository extends Repository<Comments> {
         user_id: user_id,
       });
 
-    try {
-      await comment.execute();
-      return 1;
-    } catch (err) {
-      return 0;
-    }
+    await comment.execute();
   }
 
   async deleteComment(comment_id: number, user_id: number) {
@@ -71,11 +62,6 @@ export class CommentRepository extends Repository<Comments> {
         user_id: user_id,
       });
 
-    try {
-      await comment.execute();
-      return 1;
-    } catch (err) {
-      return 0;
-    }
+    await comment.execute();
   }
 }

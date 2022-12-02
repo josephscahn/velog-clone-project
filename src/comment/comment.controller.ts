@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Delete,
-  BadRequestException,
 } from '@nestjs/common';
 import { CommentsDto } from 'src/dto/comment/comments.dto';
 import { CommentService } from './comment.service';
@@ -32,8 +31,6 @@ export class CommentController {
       user.id,
     );
 
-    if (result == 0) throw new BadRequestException(`comment create failed`);
-
     return {
       statusCode: 201,
       comments: result,
@@ -52,8 +49,6 @@ export class CommentController {
       data,
     );
 
-    if (result == 0) throw new BadRequestException('comment update failed');
-
     return {
       statusCode: 200,
       message: 'comment update success',
@@ -67,8 +62,6 @@ export class CommentController {
     @Param() params: CommentsParamDto,
   ) {
     const result = await this.commentService.deleteComment(user.id, params);
-
-    if (result == 0) throw new BadRequestException('comment delete failed');
 
     return {
       statusCode: 200,
