@@ -71,6 +71,14 @@ export class UserRepository extends Repository<User> {
       .execute();
   }
 
+  async deleteProfileImage(id: number) {
+    await this.createQueryBuilder()
+      .update()
+      .set({ profile_image: null })
+      .where('id = :id', { id })
+      .execute();
+  }
+
   async getMe(id: number) {
     return await this.query(
       `

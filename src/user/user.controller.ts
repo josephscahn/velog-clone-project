@@ -14,11 +14,15 @@ import {
   ParseIntPipe,
   Delete,
   Get,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { SocialInfoDto, UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entity/user.entity';
+import { multerOptions } from 'src/lib/multerOptions';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -36,107 +40,89 @@ export class UserController {
   ) {
     // type: [title, name, social_info]
     const id = user.id;
-    try {
-      let data: any = '';
-      let updateData: object = {};
+    // try {
+    let data: any = '';
+    let updateData: object = {};
 
-      switch (type) {
-        case 'social_info':
-          const socialInfoDto: SocialInfoDto = {
-            social_info_email: updateUserDto.social_info_email || null,
-            social_info_github: updateUserDto.social_info_github || null,
-            social_info_twitter: updateUserDto.social_info_twitter || null,
-            social_info_facebook: updateUserDto.social_info_facebook || null,
-            social_info_url: updateUserDto.social_info_url || null,
-          };
+    switch (type) {
+      case 'social_info':
+        const socialInfoDto: SocialInfoDto = {
+          social_info_email: updateUserDto.social_info_email || null,
+          social_info_github: updateUserDto.social_info_github || null,
+          social_info_twitter: updateUserDto.social_info_twitter || null,
+          social_info_facebook: updateUserDto.social_info_facebook || null,
+          social_info_url: updateUserDto.social_info_url || null,
+        };
 
-          data = await this.userService.updateSociaInfo(id, socialInfoDto);
+        data = await this.userService.updateSociaInfo(id, socialInfoDto);
 
-          break;
+        break;
 
-        case 'title':
-          if (!updateUserDto.title) {
-            throw new Error('title must be entered');
-          }
-          updateData = { title: updateUserDto.title };
-          data = await this.userService.updateUser(id, updateData);
-          break;
+      case 'title':
+        if (!updateUserDto.title) {
+          throw new BadRequestException('title must be entered');
+        }
+        updateData = { title: updateUserDto.title };
+        data = await this.userService.updateUser(id, updateData);
+        break;
 
-        case 'name':
-          if (!updateUserDto.name) {
-            throw new Error('name must be entered');
-          }
-          updateData = {
-            name: updateUserDto.name,
-            about_me: updateUserDto.about_me,
-          };
-          data = await this.userService.updateUser(id, updateData);
-          break;
+      case 'name':
+        if (!updateUserDto.name) {
+          throw new BadRequestException('name must be entered');
+        }
+        updateData = {
+          name: updateUserDto.name,
+          about_me: updateUserDto.about_me,
+        };
+        data = await this.userService.updateUser(id, updateData);
+        break;
 
-        case 'alert':
-          if (
-            !(
-              updateUserDto.comment_alert in [0, 1] &&
-              updateUserDto.update_alert in [0, 1]
-            )
-          ) {
-            throw new Error('comment_alert && update_alert must be entered');
-          }
-          updateData = {
-            comment_alert: updateUserDto.comment_alert,
-            update_alert: updateUserDto.update_alert,
-          };
-          data = await this.userService.updateUser(id, updateData);
-          break;
-      }
-
-      return { message: 'update user success', data: data };
-    } catch (err) {
-      if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-        console.log(err);
-        throw new ForbiddenException(
-          '유저 정보가 없습니다. 토큰을 확인해주세요.',
-        );
-      } else if (
-        err.message === 'title must be entered' ||
-        err.message === 'name must be entered' ||
-        err.message === 'comment_alert && update_alert must be entered'
-      ) {
-        console.log(err);
-        throw new BadRequestException(err.message);
-      } else {
-        console.log(err);
-        throw new InternalServerErrorException();
-      }
+      case 'alert':
+        updateData = {
+          comment_alert: updateUserDto.comment_alert,
+          update_alert: updateUserDto.update_alert,
+        };
+        data = await this.userService.updateUser(id, updateData);
+        break;
     }
+
+    return { message: 'update user success', data: data[0] };
   }
 
-  @Patch('/profile_image')
+  @Post('/profile_image')
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FilesInterceptor('image', 1, multerOptions))
   @HttpCode(201)
   async updateProfileImage(
-    @Body('profile_image') profile_image: string,
+    @UploadedFiles() files: File[],
+    @Query('image_url') image_url: string,
     @GetUser() user: User,
   ) {
     const id = user.id;
-    try {
-      const data = await this.userService.updateProfileImage(
-        id,
-        profile_image || null,
-      );
-      return { message: 'update profile image success', data: data };
-    } catch (err) {
-      if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-        console.log(err);
-        throw new ForbiddenException(
-          '유저 정보가 없습니다. 토큰을 확인해주세요.',
-        );
-      } else {
-        console.log(err);
-        throw new InternalServerErrorException();
-      }
-    }
+    const data = await this.userService.updateProfileImage(
+      id,
+      image_url,
+      files,
+    );
+    return {
+      message: 'update profile image success',
+      profile_image: data[0].profile_image,
+    };
+  }
+
+  @Delete('/profile_image')
+  @UseGuards(JwtAuthGuard)
+  async deleteProfileImage(
+    @Query('image_url') image_url: string,
+    @GetUser() user: User,
+  ) {
+    await this.userService.deleteProfileImage(user.id, image_url);
+
+    return {
+      statusCode: 200,
+      message: 'profile_image delete success',
+    };
   }
 
   /**

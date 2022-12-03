@@ -6,6 +6,7 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { QueryFailedError } from 'typeorm';
@@ -28,9 +29,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         break;
       case BadRequestException:
         status = (exception as any).response.statusCode;
-        message = (exception as any).response.message[0];
+        message = (exception as any).response.message;
         break;
       case UnauthorizedException:
+        status = (exception as any).response.statusCode;
+        message = (exception as any).response.message;
+        break;
+      case NotFoundException:
         status = (exception as any).response.statusCode;
         message = (exception as any).response.message;
         break;

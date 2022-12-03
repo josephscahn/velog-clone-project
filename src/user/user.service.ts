@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SocialInfoDto } from 'src/dto/user/update-user.dto';
+import { deleteImageFile, getImageURL } from 'src/lib/multerOptions';
 import { FollowRepository } from 'src/repository/follow.repository';
 import { SocialInfoRepository } from 'src/repository/social-info.repository';
 import { UserRepository } from 'src/repository/user.repository';
@@ -44,10 +45,22 @@ export class UserService {
     return await this.socialInfoRepository.getSocialInfoByUserId(id, keys);
   }
 
-  async updateProfileImage(id: number, profile_image: string) {
-    await this.userRepository.updateProfileImage(id, profile_image);
+  async updateProfileImage(id: number, image_url: string, files: File[]) {
+    if (image_url) {
+      const file_name = image_url.replace('http://localhost:8000/public/', '');
+      deleteImageFile(file_name);
+    }
+    const url = getImageURL(files)[0];
+    await this.userRepository.updateProfileImage(id, url);
 
     return this.userRepository.getUserByUserId(id, ['profile_image']);
+  }
+
+  async deleteProfileImage(id: number, image_url: string) {
+    const file_name = image_url.replace('http://localhost:8000/public/', '');
+    deleteImageFile(file_name);
+
+    await this.userRepository.deleteProfileImage(id);
   }
 
   async follow(followerId: number, followeeId: number) {

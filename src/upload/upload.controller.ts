@@ -30,7 +30,7 @@ export class UploadController {
 
   @Delete('/thumbnail')
   thumbnailDelete(@Query('image_url') image_url: string) {
-    this.thumbnailDelete(image_url);
+    this.uploadService.thumbnailDelete(image_url);
 
     return {
       statusCode: 200,
