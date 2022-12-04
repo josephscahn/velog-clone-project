@@ -166,12 +166,4 @@ export class PostService {
   async selectSaves(user_id: number) {
     return await this.postRepository.selectSaves(user_id);
   }
-
-  async selectPostListForMain(type: string, period: string) {
-    if (type == 'TREND' && !period) return 0;
-
-    const posts = await this.postRepository.selectPostListForMain(type, period);
-
-    return posts;
-  }
 }
