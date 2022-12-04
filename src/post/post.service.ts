@@ -3,17 +3,13 @@ import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { User } from 'src/entity/user.entity';
 import { PostRepository } from 'src/repository/post.repository';
-import { TagService } from 'src/tag/tag.service';
 import { PaginationDto } from 'src/dto/pagination.dto';
 import { PostSeriesRepository } from 'src/repository/post-series.repository';
 import { PostReadLogRepository } from 'src/repository/post-read-log.repository';
 import { CommentService } from 'src/comment/comment.service';
 import { SeriesService } from 'src/series/series.service';
-
-/**
- * @todo 게시글 삭제 시에 tag 테이블의 post_count 관련 기능은 추후 구현할 예정..
- * -> 현재는 post_tag 테이블 삭제까지만 구현되어 있음
- */
+import { TagRepository } from 'src/repository/tag.repository';
+import { PostTagRepository } from 'src/repository/post-tag.repository';
 
 @Injectable()
 export class PostService {
@@ -21,10 +17,23 @@ export class PostService {
     private postRepository: PostRepository,
     private postSeriesRepository: PostSeriesRepository,
     private postReadLogRepository: PostReadLogRepository,
-    private tagService: TagService,
+    private tagRepository: TagRepository,
+    private postTagRepository: PostTagRepository,
     private commentService: CommentService,
     private seriesService: SeriesService,
   ) {}
+
+  async createTag(tags: string[], post_id: number) {
+    let insert_post_tag = [];
+    for (let i = 0; i < tags.length; i++) {
+      await this.tagRepository.insertTag(tags[i], '');
+      const tag_id = await this.tagRepository.findOne({ name: tags[i] });
+
+      insert_post_tag.push({ tag: tag_id.id, post: post_id });
+    }
+
+    await this.postTagRepository.insertPostTag(insert_post_tag);
+  }
 
   async createPost(user: User, data: CreatePostDto) {
     let post_url = data.title;
@@ -39,12 +48,9 @@ export class PostService {
       post_url,
     );
 
-    if (data.tags.length > 0)
-      // 게시글 태그 관련
-      await this.tagService.tagAction(data.tags, post_id, user.id);
+    if (data.tags.length > 0) await this.createTag(data.tags, post_id);
 
     if (data.series_id) {
-      // 게시글 시리즈 관련
       await this.postSeriesRepository.createPostSeries(post_id, data.series_id);
     }
 
@@ -82,7 +88,7 @@ export class PostService {
 
     if (owner_user_id !== login_user_id) {
       const exist = await this.postReadLogRepository.getReadLogBypostId(
-        user['sub'],
+        login_user_id,
         post_id,
       );
 
@@ -104,12 +110,11 @@ export class PostService {
     await this.postRepository.updatePost(user, data, post_id);
 
     if (data.tags.length > 0) {
-      await this.tagService.deletePostTag(post_id);
-      await this.tagService.tagAction(data.tags, post_id, user.id);
+      await this.postTagRepository.deletePostTag(post_id);
+      await this.createTag(data.tags, post_id);
     }
 
     if (!data.series_id) {
-      // 시리즈에서 제외 시켰을 경우 post_series 테이블에 삭제되어야 함.
       await this.postSeriesRepository.deletePostSeries(post_id, null);
     } else {
       await this.postSeriesRepository.createPostSeries(post_id, data.series_id);
@@ -119,9 +124,7 @@ export class PostService {
   }
 
   async deletePost(user: User, post_id: number) {
-    await this.tagService.deletePostTag(post_id);
-    const delete_post = await this.postRepository.deletePost(user, post_id);
-    return delete_post;
+    await this.postRepository.deletePost(user, post_id);
   }
 
   async selectPostList(

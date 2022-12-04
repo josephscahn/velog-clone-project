@@ -54,7 +54,7 @@ export class PostController {
   @UseGuards(JwtAuthGuard)
   async createPost(@GetUser() user: User, @Body() data: CreatePostDto) {
     const result = await this.postService.createPost(user, data);
-    if (result == 0) throw new BadRequestException(`post create failed`);
+
     return {
       statusCode: 201,
       message: 'post create success',
@@ -70,13 +70,6 @@ export class PostController {
     @Param('id') post_id: number,
   ) {
     const result = await this.postService.updatePost(user, data, post_id);
-
-    // if (result.update_post == 0)
-    //   throw new BadRequestException(`post update failed`);
-
-    // if (result.post == 0) {
-    //   throw new NotFoundException(`해당 게시글을 찾을 수 없습니다.`);
-    // }
 
     return {
       statusCode: 200,

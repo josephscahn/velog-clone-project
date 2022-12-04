@@ -22,13 +22,9 @@ export class PostRepository extends Repository<Post> {
       user: user,
     });
 
-    try {
-      await this.save(post);
+    await this.save(post);
 
-      return post.id;
-    } catch (err) {
-      return 0;
-    }
+    return post.id;
   }
 
   async selectPostOne(login_user_id: number, post_id: number) {
@@ -90,12 +86,7 @@ export class PostRepository extends Repository<Post> {
         user_id: user.id,
       });
 
-    try {
-      await post.execute();
-      return 1;
-    } catch (err) {
-      return 0;
-    }
+    await post.execute();
   }
 
   async deletePost(user: User, post_id: number) {
@@ -107,12 +98,7 @@ export class PostRepository extends Repository<Post> {
         user_id: user.id,
       });
 
-    try {
-      await post.execute();
-      return 1;
-    } catch (err) {
-      return 0;
-    }
+    await post.execute();
   }
 
   async selectPostList(

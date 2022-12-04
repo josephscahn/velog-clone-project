@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentModule } from 'src/comment/comment.module';
 import { PostReadLogRepository } from 'src/repository/post-read-log.repository';
 import { PostSeriesRepository } from 'src/repository/post-series.repository';
+import { PostTagRepository } from 'src/repository/post-tag.repository';
 import { PostRepository } from 'src/repository/post.repository';
+import { TagRepository } from 'src/repository/tag.repository';
 import { SeriesModule } from 'src/series/series.module';
-import { TagModule } from 'src/tag/tag.module';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 
@@ -15,8 +16,9 @@ import { PostService } from './post.service';
       PostRepository,
       PostSeriesRepository,
       PostReadLogRepository,
+      TagRepository,
+      PostTagRepository,
     ]),
-    TagModule,
     CommentModule,
     SeriesModule,
   ],

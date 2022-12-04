@@ -54,7 +54,7 @@ export class Post extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToMany((type) => PostTag, (post_tag) => post_tag.post)
+  @OneToMany((type) => PostTag, (post_tag) => post_tag.post, { cascade: true })
   @JoinTable({
     joinColumn: {
       name: 'post_tag',
