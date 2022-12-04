@@ -20,8 +20,7 @@ export class ListsController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   async getReadList(@GetUser() user: User) {
-    const data = await this.listsService.getReadLog(user.id);
-    return data;
+    return await this.listsService.getReadLog(user.id);
   }
 
   @Patch('/read/:post_id')
@@ -30,14 +29,12 @@ export class ListsController {
     @GetUser() user: User,
     @Param('post_id') post_id: number,
   ) {
-    const data = await this.listsService.deleteReadList(user.id, post_id);
-    return data;
+    return await this.listsService.deleteReadList(user.id, post_id);
   }
 
   @Get('/like')
   @UseGuards(JwtAuthGuard)
   async getLikedList(@GetUser() user: User) {
-    const data = await this.listsService.getLikedList(user.id);
-    return data;
+    return await this.listsService.getLikedList(user.id);
   }
 }

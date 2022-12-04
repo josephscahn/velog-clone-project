@@ -58,7 +58,6 @@ export class LologService {
       return new NotFoundException('이미 좋아요 한 게시글 입니다');
     }
     await this.postLikeRepository.likePost(user_id, post_id);
-    await this.postRepository.updateLikeCount(post_id);
   }
 
   async unlikePost(user_id: number, post_id: number) {
@@ -70,6 +69,5 @@ export class LologService {
       return new NotFoundException('좋아요를 하지 않은 게시글입니다');
     }
     await this.postLikeRepository.unlikePost(user_id, post_id);
-    await this.postRepository.updateLikeCount(post_id);
   }
 }

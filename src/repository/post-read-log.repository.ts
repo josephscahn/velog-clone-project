@@ -22,31 +22,23 @@ export class PostReadLogRepository extends Repository<PostReadLog> {
   }
 
   async getReadLog(user_id: number) {
-    return await this.query(
-      `
-      SELECT 
-      JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'post_id', post.id, 
-          'post_title', post.title, 
-          'post_thumbnail', post.thumbnail, 
-          'post_content', post.content, 
-          'post_likes', post.likes, 
-          'post_comment_count', post.comment_count,
-          'post_create_at', DATE_FORMAT(post.create_at, "%Y년 %m월 %d일"),
-          'user_id', user.id,
-          'user_name', user.name,
-          'user_profile_image', user.profile_image
-        )
-      ) as ReadLog
-      FROM post_read_log
-      LEFT JOIN post ON post_read_log.post_id = post.id
-      LEFT JOIN user ON post.user_id = user.id
-      WHERE post_read_log.user_id = ?
-      ORDER BY post_read_log.create_at DESC;
-      `,
-      [user_id],
-    );
+    return await this.createQueryBuilder('post_read_log')
+      .leftJoin('post', 'post', 'post_read_log.post_id = post.id')
+      .leftJoin('user', 'user', 'post.user = user.id')
+      .select([
+        'post.id AS post_id',
+        'post.title',
+        'post.thumbnail',
+        'post.likes',
+        'post.comment_count',
+        'post.create_at AS create_at',
+        'user.id AS user_id',
+        'user.name',
+        'user.profile_image',
+      ])
+      .where('post_read_log.user_id = :user_id', { user_id })
+      .groupBy('post.id')
+      .getRawMany();
   }
 
   async deleteReadList(user_id: number, post_id: number) {

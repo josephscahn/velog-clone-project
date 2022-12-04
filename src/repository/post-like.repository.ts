@@ -20,29 +20,23 @@ export class PostLikeRepository extends Repository<PostLike> {
   }
 
   async getLikedList(user_id: number) {
-    return await this.query(
-      `
-        SELECT
-          JSON_ARRAYAGG(
-            JSON_OBJECT(
-              'post_id', post.id,
-              'title', post.title,
-              'thumbnail', post.thumbnail,
-              'content', post.content,
-              'create_at', DATE_FORMAT(post.create_at, "%Y년 %m월 %d일"),
-              'post_likes', post.likes, 
-              'post_comment_count', post.comment_count,
-              'user_id', user.id,
-              'user_name', user.name,
-              'user_profile_image', user.profile_image
-            )
-          ) AS LIKED_POST
-        FROM post_like
-        LEFT JOIN post ON post_like.post_id = post.id
-        LEFT JOIN user ON post_like.user_id = user.id
-        WHERE post_like.user_id = ?;
-      `,
-      [user_id],
-    );
+    return await this.createQueryBuilder('post_like')
+      .leftJoin('post', 'post', 'post_like.post_id = post.id')
+      .leftJoin('user', 'user', 'post.user = user.id')
+      .select([
+        'post.id AS post_id',
+        'post.likes',
+        'post.title',
+        'post.thumbnail',
+        'post.content',
+        'post.comment_count',
+        'post.create_at AS create_at',
+        'user.id AS user_id',
+        'user.name',
+        'user.profile_image',
+      ])
+      .where('post_like.user_id = :user_id', { user_id })
+      .groupBy('post.id')
+      .getRawMany();
   }
 }
