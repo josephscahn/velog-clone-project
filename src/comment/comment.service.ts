@@ -14,6 +14,9 @@ export class CommentService {
     );
 
     for (let i = 0; i < result.length; i++) {
+      result[i].is_comments_writer = Number.parseInt(
+        result[i].is_comments_writer,
+      );
       if (result[i].nested_comments) {
         const to_json = JSON.parse(result[i].nested_comments);
 
