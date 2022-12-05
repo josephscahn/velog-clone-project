@@ -41,13 +41,14 @@ export class LologService {
   }
 
   async getAboutBlog(user_id: number) {
-    return await this.userService.selectAboutBlog(user_id);
+    const about = await this.userService.selectAboutBlog(user_id);
+    return about[0];
   }
 
   async editAboutBlog(user_id: number, about_blog: string) {
     await this.userService.updateAboutBlog(user_id, about_blog);
 
-    return await this.userService.selectAboutBlog(user_id);
+    return await this.getAboutBlog(user_id);
   }
 
   async likePost(user_id: number, post_id: number) {
