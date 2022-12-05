@@ -7,10 +7,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
-  JoinTable,
 } from 'typeorm';
-import { NestedCommentsView } from './comments-view.entity';
 import { Post } from './post.entity';
 import { User } from './user.entity';
 
@@ -39,20 +36,4 @@ export class Comments extends BaseEntity {
   @ManyToOne((type) => Post, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post: number;
-
-  @OneToMany(
-    (type) => NestedCommentsView,
-    (nested_comments) => nested_comments.comment,
-  )
-  @JoinTable({
-    joinColumn: {
-      name: 'nested_comments',
-      referencedColumnName: 'parent_id',
-    },
-    inverseJoinColumn: {
-      name: 'comments',
-      referencedColumnName: 'id',
-    },
-  })
-  nested_comments: NestedCommentsView;
 }

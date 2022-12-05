@@ -86,7 +86,7 @@ export class PostService {
 
     const interested_posts = await this.postRepository.interestedPostList();
 
-    if (owner_user_id !== login_user_id) {
+    if (owner_user_id !== login_user_id && user) {
       const exist = await this.postReadLogRepository.getReadLogBypostId(
         login_user_id,
         post_id,
@@ -101,6 +101,7 @@ export class PostService {
       post_id,
       login_user_id,
     );
+
     const series = await this.seriesService.selectPostSeriesList(post_id);
 
     return { post, next_post, pre_post, interested_posts, comments, series };
