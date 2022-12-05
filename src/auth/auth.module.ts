@@ -24,7 +24,7 @@ import { FacebookStrategy } from './strategies/facebook.strategy';
         port: 587,
         auth: {
           user: 'velog-clone-project', // generated ethereal user
-          pass: 'velog-clone1!', // generated ethereal password
+          pass: 'velog-clone1!!', // generated ethereal password
         },
       },
     }),

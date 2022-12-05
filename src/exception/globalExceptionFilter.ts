@@ -3,10 +3,10 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
-  Injectable,
   BadRequestException,
   UnauthorizedException,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { QueryFailedError } from 'typeorm';
@@ -36,6 +36,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = (exception as any).response.message;
         break;
       case NotFoundException:
+        status = (exception as any).response.statusCode;
+        message = (exception as any).response.message;
+        break;
+      case ConflictException:
         status = (exception as any).response.statusCode;
         message = (exception as any).response.message;
         break;

@@ -16,7 +16,9 @@ export class AuthService {
   ) {}
 
   async sendEmail(email: string) {
-    const code: string = Math.round(Math.random() * 10000).toString();
+    const code: string = Math.round(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     this.mailerService
       .sendMail({
         to: email, // List of receivers email address

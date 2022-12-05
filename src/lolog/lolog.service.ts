@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -55,7 +56,7 @@ export class LologService {
       post_id,
     );
     if (data) {
-      return new NotFoundException('이미 좋아요 한 게시글 입니다');
+      throw new ConflictException('이미 좋아요 한 게시글 입니다');
     }
     await this.postLikeRepository.likePost(user_id, post_id);
   }
@@ -66,7 +67,7 @@ export class LologService {
       post_id,
     );
     if (!data) {
-      return new NotFoundException('좋아요를 하지 않은 게시글입니다');
+      throw new NotFoundException('좋아요를 하지 않은 게시글입니다');
     }
     await this.postLikeRepository.unlikePost(user_id, post_id);
   }

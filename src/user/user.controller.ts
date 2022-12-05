@@ -6,8 +6,6 @@ import {
   ValidationPipe,
   UseGuards,
   Body,
-  ForbiddenException,
-  InternalServerErrorException,
   BadRequestException,
   Query,
   Post,
@@ -40,7 +38,6 @@ export class UserController {
   ) {
     // type: [title, name, social_info]
     const id = user.id;
-    // try {
     let data: any = '';
     let updateData: object = {};
 
@@ -78,6 +75,12 @@ export class UserController {
         break;
 
       case 'alert':
+        if (
+          updateUserDto.comment_alert === undefined ||
+          updateUserDto.update_alert === undefined
+        ) {
+          throw new BadRequestException('alert must be entered');
+        }
         updateData = {
           comment_alert: updateUserDto.comment_alert,
           update_alert: updateUserDto.update_alert,
