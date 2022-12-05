@@ -19,12 +19,12 @@ import { FacebookStrategy } from './strategies/facebook.strategy';
     TypeOrmModule.forFeature([UserRepository]),
     MailerModule.forRoot({
       transport: {
-        service: 'Naver',
-        host: 'smtp.naver.com',
+        service: 'Gmail',
+        host: 'smtp.gmail.com',
         port: 587,
         auth: {
-          user: 'velog-clone-project', // generated ethereal user
-          pass: 'velog-clone1!!', // generated ethereal password
+          user: process.env.GMAIL_LOGIN_ID, // generated ethereal user
+          pass: process.env.GMAIL_PASSWORD, // generated ethereal password
         },
       },
     }),
