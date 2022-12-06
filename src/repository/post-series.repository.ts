@@ -14,18 +14,22 @@ export class PostSeriesRepository extends Repository<PostSeries> {
       .execute();
   }
 
-  async selectPostSeriesSort(series_id: number) {
-    const sort = await this.createQueryBuilder('post_series')
-      .where('series_id = :series_id', { series_id: series_id })
-      .select(['sort'])
-      .orderBy('sort', 'DESC')
-      .limit(1);
+  async getPostSeriesId(post_id: number) {
+    return await this.query(
+      `SELECT id FROM post_series
+       WHERE series_id = (SELECT series_id FROM post_series WHERE post_id = ?)
+       AND post_id <> ?
+       ORDER BY sort ASC`,
+      [post_id, post_id],
+    );
+  }
 
-    try {
-      return await sort.getRawMany();
-    } catch (error) {
-      return 0;
-    }
+  async updateSort(sort: number, id: number) {
+    await this.createQueryBuilder()
+      .update(PostSeries)
+      .set({ sort: sort })
+      .where('id = :id', { id: id })
+      .execute();
   }
 
   async createPostSeries(post_id: number, series_id: number) {
@@ -40,24 +44,29 @@ export class PostSeriesRepository extends Repository<PostSeries> {
 
     if (post_id) post_series.where(`post_id = :post_id`, { post_id: post_id });
 
-    if (series_id)
-      post_series.where('series_id = :series_id', { series_id: series_id });
+    if (series_id) post_series.where('series_id = :series_id', { series_id: series_id });
 
     await post_series.execute();
   }
 
   async selectPostSeriesList(post_id: number) {
-    const post_series = this.query(
-      `SELECT 
-    post_series.sort,
-    post.id,
-    post.title
-    FROM post_series
-    LEFT JOIN post ON post.id = post_series.post_id
-    WHERE post_series.series_id = (SELECT series_id FROM post_series WHERE post_id = ?)
-    ORDER BY post_series.sort`,
-      [post_id],
-    );
+    const post_series = await this.createQueryBuilder('post_series')
+      .leftJoin('post', 'post', 'post_series.post_id = post.id')
+      .leftJoin('series', 'series', 'post_series.series_id = series.id')
+      .select([
+        'series.id AS series_id',
+        'series.series_name AS series_name',
+        'post_series.sort AS sort',
+        'post.id AS post_id',
+        'post.title AS title',
+      ])
+      .where('series.id = (SELECT series_id FROM post_series WHERE post_id = :post_id)', {
+        post_id: post_id,
+      })
+      .orderBy('post_series.sort', 'ASC')
+      .getRawMany();
+
+    if (post_series.length === 0) return null;
 
     return post_series;
   }

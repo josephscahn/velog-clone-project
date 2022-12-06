@@ -10,7 +10,6 @@ import {
   OneToMany,
   JoinTable,
 } from 'typeorm';
-import { PostSeries } from './post-series.entity';
 import { PostTag } from './post-tag.entity';
 import { User } from './user.entity';
 import { TagsView } from './view-tags.entity';
@@ -44,17 +43,20 @@ export class Post extends BaseEntity {
   @Column()
   post_url: string;
 
+  @Column()
+  description: string;
+
   @CreateDateColumn()
   create_at: Date;
 
   @UpdateDateColumn()
   update_at: Date;
 
-  @ManyToOne((type) => User, { onDelete: 'CASCADE' })
+  @ManyToOne(type => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToMany((type) => PostTag, (post_tag) => post_tag.post, { cascade: true })
+  @OneToMany(type => PostTag, post_tag => post_tag.post, { cascade: true })
   @JoinTable({
     joinColumn: {
       name: 'post_tag',
@@ -67,7 +69,7 @@ export class Post extends BaseEntity {
   })
   post_tag: PostTag[];
 
-  @OneToMany((type) => TagsView, (tags) => tags.post)
+  @OneToMany(type => TagsView, tags => tags.post)
   @JoinTable({
     joinColumn: {
       name: 'tags',

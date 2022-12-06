@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsNumber,
-  Min,
-  Max,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreatePostDto {
@@ -36,4 +29,8 @@ export class CreatePostDto {
   @IsOptional()
   @IsString()
   post_url: string;
+
+  @IsOptional()
+  @IsString()
+  description: string;
 }

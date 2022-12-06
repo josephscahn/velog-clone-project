@@ -1,3 +1,4 @@
+import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { Post } from 'src/entity/post.entity';
 import { User } from 'src/entity/user.entity';
@@ -6,20 +7,14 @@ import { Brackets, EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Post)
 export class PostRepository extends Repository<Post> {
-  async createPost(
-    user: User,
-    title: string,
-    content: string,
-    status: number,
-    thumbnail: string,
-    post_url: string,
-  ) {
+  async createPost(user: User, data: CreatePostDto) {
     const post = this.create({
-      title: title,
-      content: content,
-      status: status,
-      thumbnail: thumbnail,
-      post_url: post_url,
+      title: data.title,
+      content: data.content,
+      status: data.status,
+      thumbnail: data.thumbnail,
+      post_url: data.post_url,
+      description: data.description,
       user: user,
     });
 
@@ -47,6 +42,8 @@ export class PostRepository extends Repository<Post> {
         'post.likes AS likes',
         'IF(post.user_id = :userId, 1, 0) AS is_writer',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
+        'post.post_url as post_url',
+        'post.description as description',
       ])
       .setParameter('userId', login_user_id)
       .andWhere('post.id = :post_id', { post_id: post_id });
@@ -81,6 +78,8 @@ export class PostRepository extends Repository<Post> {
         content: data.content,
         status: data.status,
         thumbnail: data.thumbnail,
+        post_url: data.post_url,
+        description: data.description,
       })
       .where(`id = :post_id AND user_id = :user_id`, {
         post_id: post_id,
@@ -119,7 +118,7 @@ export class PostRepository extends Repository<Post> {
         'post.id as post_id',
         'post.thumbnail',
         'post.title',
-        'post.content',
+        'post.description',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
         'post.create_at AS create_at',
         'post.comment_count',
@@ -203,7 +202,7 @@ export class PostRepository extends Repository<Post> {
         'post.id AS post_id',
         'post.thumbnail',
         'post.title',
-        'post.content',
+        'post.description',
         'post.create_at AS create_at',
         'post.comment_count',
         'post.likes',
@@ -249,7 +248,6 @@ export class PostRepository extends Repository<Post> {
   }
 
   async interestedPostList() {
-    // 관심 있을 만한 포스트는 임의로 랜덤 12개 가지고 오도록 하였음.
     const posts = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
       .leftJoin('post.post_tag', 'post_tag')
@@ -261,7 +259,7 @@ export class PostRepository extends Repository<Post> {
         'post.id AS post_id',
         'post.thumbnail',
         'post.title',
-        'post.content',
+        'post.description',
         'post.create_at AS create_at',
         'post.comment_count',
         'post.likes',
@@ -272,13 +270,7 @@ export class PostRepository extends Repository<Post> {
     return await posts.getRawMany();
   }
 
-  async mainSearch(
-    keywords: string,
-    userId: number,
-    user: User,
-    offset: number,
-    limit: number,
-  ) {
+  async mainSearch(keywords: string, userId: number, user: User, offset: number, limit: number) {
     let main_search = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
       .leftJoin('post.tags', 'tags')
@@ -291,13 +283,13 @@ export class PostRepository extends Repository<Post> {
         'post.id AS post_id',
         'post.thumbnail',
         'post.title',
-        'post.content',
+        'post.description',
         'post.create_at AS create_at',
         'post.comment_count',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
       .andWhere(
-        new Brackets((qb) => {
+        new Brackets(qb => {
           qb.orWhere('post.title REGEXP :keywords', { keywords: keywords })
             .orWhere('post.content REGEXP :keywords', { keywords: keywords })
             .orWhere('tag.name REGEXP :keywords', { keywords: keywords });

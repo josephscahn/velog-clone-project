@@ -23,11 +23,7 @@ export class SeriesService {
     return this.selectSeriesList(user_id);
   }
 
-  async SelectSereisPosts(
-    series_id: number,
-    sort: SelectSereisPostsDto,
-    user?: User,
-  ) {
+  async SelectSereisPosts(series_id: number, sort: SelectSereisPostsDto, user?: User) {
     let login_user_id = -1;
 
     if (user != null) {
@@ -56,15 +52,6 @@ export class SeriesService {
   }
 
   async deleteSeries(seires_id: number) {
-    await this.postSeriesRepository.deletePostSeries(null, seires_id);
     await this.seriesRepository.deleteSeries(seires_id);
-  }
-
-  async selectPostSeriesList(post_id: number) {
-    const post_series = await this.postSeriesRepository.selectPostSeriesList(
-      post_id,
-    );
-
-    return post_series;
   }
 }
