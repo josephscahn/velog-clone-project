@@ -146,11 +146,16 @@ export class PostService {
       }
     }
 
+    if (posts.length == 0) return null;
+
     return posts;
   }
 
   async selectSaves(user_id: number) {
-    return await this.postRepository.selectSaves(user_id);
+    const saves = await this.postRepository.selectSaves(user_id);
+
+    if (saves.length == 0) return null;
+    return saves;
   }
 
   async createTag(tags: string[], post_id: number) {

@@ -20,16 +20,23 @@ export class PostTagRepository extends Repository<PostTag> {
 
   async selectTagListByUserId(user_id: number) {
     const tags = await this.query(
-      `SELECT
-    COUNT(post_tag.tag_id) AS post_count,
-    tag.id AS tag_id,
-    tag.name
-    FROM post_tag
-    LEFT JOIN tag ON tag.id = post_tag.tag_id
-    LEFT JOIN post ON post.id = post_tag.post_id
-    WHERE post.user_id = ?
-    GROUP BY post_tag.tag_id`,
-      [user_id],
+      `(SELECT
+        COUNT(id) AS post_count,
+        0 AS tag_id,
+        '전체보기' AS name
+        FROM post 
+        WHERE user_id = ?)
+        UNION
+        (SELECT
+        COUNT(post_tag.tag_id) AS post_count,
+        tag.id AS tag_id,
+        tag.name
+        FROM post_tag
+        LEFT JOIN tag ON tag.id = post_tag.tag_id
+        LEFT JOIN post ON post.id = post_tag.post_id
+        WHERE post.user_id = ?
+        GROUP BY post_tag.tag_id);`,
+      [user_id, user_id],
     );
 
     return tags;

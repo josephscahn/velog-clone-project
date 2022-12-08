@@ -50,7 +50,7 @@ export const getImageURL = (files: File[]) => {
   return generatedFiles;
 };
 
-export const deleteImageFile = (file_name) => {
+export const deleteImageFile = file_name => {
   if (existsSync('./public/' + file_name)) {
     unlinkSync('./public/' + file_name);
   }

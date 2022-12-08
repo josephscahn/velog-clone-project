@@ -13,10 +13,15 @@ import { SearchModule } from './search/search.module';
 import { UploadModule } from './upload/upload.module';
 import { GlobalExceptionFilter } from './exception/globalExceptionFilter';
 import { APP_FILTER } from '@nestjs/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: 'public',
+      serveRoot: '/public',
+    }),
     UserModule,
     AuthModule,
     PostModule,
@@ -29,7 +34,6 @@ import { APP_FILTER } from '@nestjs/core';
     SearchModule,
     UploadModule,
   ],
-  // providers: [],
   providers: [
     {
       provide: APP_FILTER,
