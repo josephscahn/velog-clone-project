@@ -7,7 +7,6 @@ import { SeriesController } from './series.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([SeriesRepository, PostSeriesRepository])],
-  exports: [TypeOrmModule, SeriesService],
   providers: [SeriesService],
   controllers: [SeriesController],
 })

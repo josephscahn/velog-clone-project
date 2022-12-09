@@ -33,8 +33,7 @@ export class UserRepository extends Repository<User> {
   }
 
   async signupWithSocial(createSocialUserDto: CreateSocialUserDto) {
-    const { name, email, login_id, about_me, provider, profile_image } =
-      createSocialUserDto;
+    const { name, email, login_id, about_me, provider, profile_image } = createSocialUserDto;
     const user = this.create({
       name,
       email,
@@ -49,18 +48,11 @@ export class UserRepository extends Repository<User> {
   }
 
   async updateUser(id: number, updateData: object) {
-    await this.createQueryBuilder()
-      .update()
-      .set(updateData)
-      .where('id = :id', { id })
-      .execute();
+    await this.createQueryBuilder().update().set(updateData).where('id = :id', { id }).execute();
   }
 
   async getUserByUserId(id: number, keys: string[]) {
-    return await this.createQueryBuilder()
-      .select(keys)
-      .where('id = :id', { id })
-      .execute();
+    return await this.createQueryBuilder().select(keys).where('id = :id', { id }).execute();
   }
 
   async updateProfileImage(id: number, profile_image: string) {
@@ -100,17 +92,14 @@ export class UserRepository extends Repository<User> {
       .execute();
   }
 
-  async selectAboutBlog(user_id: number) {
+  async selectAboutBlog(user_id: number, login_user_id: number) {
     return await this.query(
-      `SELECT id AS user_id, about_blog FROM user WHERE id = ?`,
-      [user_id],
+      `SELECT id AS user_id, about_blog, IF(id = ?, 1, 0) as is_owner FROM user WHERE id = ?`,
+      [login_user_id, user_id],
     );
   }
 
   async withdrawal(user_id: number) {
-    await this.createQueryBuilder()
-      .delete()
-      .where('id = :user_id', { user_id })
-      .execute();
+    await this.createQueryBuilder().delete().where('id = :user_id', { user_id }).execute();
   }
 }

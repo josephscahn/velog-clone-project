@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SocialInfoDto } from 'src/dto/user/update-user.dto';
+import { User } from 'src/entity/user.entity';
 import { deleteImageFile, getImageURL } from 'src/lib/multerOptions';
 import { FollowRepository } from 'src/repository/follow.repository';
 import { SocialInfoRepository } from 'src/repository/social-info.repository';
@@ -18,10 +19,8 @@ export class UserService {
   private followRepository: FollowRepository;
   constructor(private readonly connection: Connection) {
     this.userRepository = this.connection.getCustomRepository(UserRepository);
-    this.socialInfoRepository =
-      this.connection.getCustomRepository(SocialInfoRepository);
-    this.followRepository =
-      this.connection.getCustomRepository(FollowRepository);
+    this.socialInfoRepository = this.connection.getCustomRepository(SocialInfoRepository);
+    this.followRepository = this.connection.getCustomRepository(FollowRepository);
   }
 
   async findOne(login_id: string) {
@@ -72,10 +71,7 @@ export class UserService {
       throw new NotFoundException('Not Found UserId');
     }
 
-    const data = await this.followRepository.checkFollow(
-      followerId,
-      followeeId,
-    );
+    const data = await this.followRepository.checkFollow(followerId, followeeId);
     if (data) {
       throw new ConflictException('Already follow');
     }
@@ -90,10 +86,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('Not Found UserId');
     }
-    const data = await this.followRepository.checkFollow(
-      followerId,
-      followeeId,
-    );
+    const data = await this.followRepository.checkFollow(followerId, followeeId);
     if (!data) {
       throw new ConflictException('Already unfollow');
     }
@@ -125,10 +118,6 @@ export class UserService {
 
   async updateAboutBlog(user_id: number, about_blog: string) {
     await this.userRepository.updateAboutBlog(user_id, about_blog);
-  }
-
-  async selectAboutBlog(user_id: number) {
-    return await this.userRepository.selectAboutBlog(user_id);
   }
 
   async withdrawal(user_id: number) {

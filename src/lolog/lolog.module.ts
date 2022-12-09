@@ -1,22 +1,20 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostModule } from 'src/post/post.module';
 import { PostLikeRepository } from 'src/repository/post-like.repository';
-import { SeriesModule } from 'src/series/series.module';
-import { UserModule } from 'src/user/user.module';
+import { PostTagRepository } from 'src/repository/post-tag.repository';
+import { PostRepository } from 'src/repository/post.repository';
+import { UserRepository } from 'src/repository/user.repository';
 import { LologController } from './lolog.controller';
 import { LologService } from './lolog.service';
 
 @Module({
   imports: [
-    PostModule,
-    SeriesModule,
-    UserModule,
-    TypeOrmModule.forFeature([PostLikeRepository]),
-    JwtModule.register({
-      secret: process.env.SECRET_KEY,
-    }),
+    TypeOrmModule.forFeature([
+      PostRepository,
+      PostLikeRepository,
+      PostTagRepository,
+      UserRepository,
+    ]),
   ],
   controllers: [LologController],
   providers: [LologService],

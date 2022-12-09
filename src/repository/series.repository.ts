@@ -14,7 +14,7 @@ export class SeriesRepository extends Repository<Series> {
         'series.thumbnail',
         'series.series_name',
         'series.post_count',
-        'series.create_at',
+        'series.update_at',
       ])
       .groupBy('series.id')
       .orderBy('series.create_at', 'ASC');
@@ -31,11 +31,7 @@ export class SeriesRepository extends Repository<Series> {
     await this.save(series);
   }
 
-  async SelectSereisPosts(
-    series_id: number,
-    sort: SeriesSort,
-    login_user_id: number,
-  ) {
+  async SelectSereisPosts(series_id: number, sort: SeriesSort, login_user_id: number) {
     const series_posts = this.createQueryBuilder('series')
       .leftJoin('series.post_series', 'post_series')
       .leftJoin('post', 'post', 'post_series.post_id = post.id')
@@ -65,11 +61,11 @@ export class SeriesRepository extends Repository<Series> {
     return await series_posts.getRawMany();
   }
 
-  async deleteSeries(seires_id: number) {
+  async deleteSeries(series_id: number) {
     await this.createQueryBuilder()
       .delete()
       .from(Series)
-      .where('id = :seires_id', { seires_id: seires_id })
+      .where('id = :series_id', { series_id: series_id })
       .execute();
   }
 }

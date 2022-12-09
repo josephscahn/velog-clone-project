@@ -51,7 +51,7 @@ export class SeriesService {
     }
   }
 
-  async deleteSeries(seires_id: number) {
-    await this.seriesRepository.deleteSeries(seires_id);
+  async deleteSeries(series_id: number) {
+    await this.seriesRepository.deleteSeries(series_id);
   }
 }

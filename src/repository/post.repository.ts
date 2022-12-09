@@ -1,3 +1,4 @@
+import { PaginationDto } from 'src/dto/pagination.dto';
 import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { Post } from 'src/entity/post.entity';
@@ -101,13 +102,8 @@ export class PostRepository extends Repository<Post> {
     await post.execute();
   }
 
-  async selectPostList(
-    user_id: number,
-    is_owner: boolean,
-    tag_id: number,
-    offset: number,
-    limit: number,
-  ) {
+  async selectPostList(user_id: number, is_owner: boolean, pagination: PaginationDto) {
+    const { tag_id, offset, limit } = pagination;
     let posts = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
       .leftJoin('post.tags', 'tags')

@@ -12,14 +12,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      UserRepository,
-      SocialInfoRepository,
-      FollowRepository,
-    ]),
-  ],
-  exports: [TypeOrmModule, UserService],
+  imports: [TypeOrmModule.forFeature([UserRepository, SocialInfoRepository, FollowRepository])],
   controllers: [UserController],
   providers: [
     UserService,

@@ -14,6 +14,7 @@ import { UploadModule } from './upload/upload.module';
 import { GlobalExceptionFilter } from './exception/globalExceptionFilter';
 import { APP_FILTER } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { AboutModule } from './about/about.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     MainModule,
     SearchModule,
     UploadModule,
+    AboutModule,
   ],
   providers: [
     {

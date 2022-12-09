@@ -117,40 +117,6 @@ export class PostService {
     await this.postRepository.deletePost(user, post_id);
   }
 
-  async selectPostList(user_id: number, pagination: PaginationDto, user?: User) {
-    let login_user_id = -1;
-
-    if (user != null) {
-      login_user_id = user['sub'];
-    }
-
-    let is_owner = false;
-
-    if (user_id === login_user_id) {
-      is_owner = true;
-    }
-
-    const posts = await this.postRepository.selectPostList(
-      user_id,
-      is_owner,
-      pagination.tag_id,
-      pagination.offset,
-      pagination.limit,
-    );
-
-    for (let i = 0; i < posts.length; i++) {
-      if (posts[i].tags) {
-        const to_json = JSON.parse(posts[i].tags);
-
-        posts[i].tags = to_json;
-      }
-    }
-
-    if (posts.length == 0) return null;
-
-    return posts;
-  }
-
   async selectSaves(user_id: number) {
     const saves = await this.postRepository.selectSaves(user_id);
 
