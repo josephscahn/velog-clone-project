@@ -11,6 +11,7 @@ export class CommentRepository extends Repository<Comments> {
         child.parent_id,
         JSON_ARRAYAGG(
            JSON_OBJECT(
+              'post_id', child.post_id,
               'user_id', user.id,
               'comment_login_id', user.login_id,
               'comment_profile_image', user.profile_image,
@@ -26,7 +27,8 @@ export class CommentRepository extends Repository<Comments> {
           user_id, 
           content,
           create_at, 
-          parent_id 
+          parent_id,
+          post_id
           FROM comments
           ORDER BY create_at DESC) as child
         INNER JOIN comments parent ON parent.id = child.parent_id

@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  UseGuards,
-  Post,
-  Param,
-  Patch,
-  Delete,
-} from '@nestjs/common';
+import { Body, Controller, UseGuards, Post, Param, Patch, Delete } from '@nestjs/common';
 import { CommentsDto } from 'src/dto/comment/comments.dto';
 import { CommentService } from './comment.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -25,11 +17,7 @@ export class CommentController {
     @GetUser() user: User,
     @Param('id') post_id: number,
   ) {
-    const result = await this.commentService.createComment(
-      data,
-      post_id,
-      user.id,
-    );
+    const result = await this.commentService.createComment(data, post_id, user.id);
 
     return {
       statusCode: 201,
@@ -37,17 +25,13 @@ export class CommentController {
     };
   }
 
-  @Patch('/:comment_id')
+  @Patch('/:post_id/:comment_id')
   async updateComment(
     @GetUser() user: User,
     @Param() params: CommentsParamDto,
     @Body() data: CommentsDto,
   ) {
-    const result = await this.commentService.updateComment(
-      user.id,
-      params,
-      data,
-    );
+    const result = await this.commentService.updateComment(user.id, params, data);
 
     return {
       statusCode: 200,
@@ -57,12 +41,8 @@ export class CommentController {
   }
 
   @Delete('/:post_id/:comment_id')
-  async deleteComment(
-    @GetUser() user: User,
-    @Param() params: CommentsParamDto,
-  ) {
+  async deleteComment(@GetUser() user: User, @Param() params: CommentsParamDto) {
     const result = await this.commentService.deleteComment(user.id, params);
-
     return {
       statusCode: 200,
       message: 'comment delete success',

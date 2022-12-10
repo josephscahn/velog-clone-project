@@ -25,15 +25,15 @@ export class Comments extends BaseEntity {
   @UpdateDateColumn()
   update_at: Date;
 
-  @ManyToOne((type) => Comments)
+  @ManyToOne(type => Comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'parent_id' })
   comment: number;
 
-  @ManyToOne((type) => User, { onDelete: 'CASCADE' })
+  @ManyToOne(type => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: number;
 
-  @ManyToOne((type) => Post, { onDelete: 'CASCADE' })
+  @ManyToOne(type => Post, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post: number;
 }
