@@ -33,7 +33,6 @@ export class AuthController {
     const user = await this.authService.checkEmail(email);
 
     if (user) {
-      console.log('err');
       throw new ConflictException('이미 가입된 이메일입니다.');
     } else {
       const code = await this.authService.sendEmail(email);
@@ -41,13 +40,21 @@ export class AuthController {
     }
   }
 
+  @Post('login_id')
+  async checkLoginId(@Body('login_id') login_id: string) {
+    const user = await this.authService.checkLoginId(login_id);
+
+    if (user) {
+      throw new ConflictException('이미 가입된 로그인 아이디입니다.');
+    } else {
+      return { message: '사용 가능한 로그인 아이디입니다' };
+    }
+  }
+
   @Post('/signup')
   @UsePipes(ValidationPipe)
   @HttpCode(201)
-  async signupWithEmail(
-    @Query('type') type: string,
-    @Body() createUserDto: CreateUserDto,
-  ) {
+  async signupWithEmail(@Query('type') type: string, @Body() createUserDto: CreateUserDto) {
     try {
       let token: string = '';
       switch (type) {
@@ -83,9 +90,7 @@ export class AuthController {
             profile_image: createUserDto.profile_image,
             provider: type,
           };
-          token = await this.authService.signupWithSocial(
-            createFacebookUserDto,
-          );
+          token = await this.authService.signupWithSocial(createFacebookUserDto);
           break;
         default:
           throw new BadRequestException(
@@ -95,10 +100,8 @@ export class AuthController {
       return { message: 'signup & login success', token };
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') {
-        console.log(err);
-        throw new ConflictException('이메일이 중복 되었습니다');
+        throw new ConflictException('이메일 또는 로그인 아이디가 중복 되었습니다');
       } else {
-        console.log(err);
         throw new InternalServerErrorException();
       }
     }

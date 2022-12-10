@@ -2,15 +2,19 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { User } from 'src/entity/user.entity';
 
-export const ValidateToken = createParamDecorator(
-  (data, ctx: ExecutionContext): User => {
-    const bearerToken = ctx.switchToHttp().getRequest()['rawHeaders'][1];
-    if (bearerToken.includes('Bearer')) {
-      const token = bearerToken.replace('Bearer ', '');
-      const user = jwt.verify(token, process.env.SECRET_KEY)['user'];
+export const ValidateToken = createParamDecorator((_data, ctx: ExecutionContext): User => {
+  const rawHeaders = ctx.switchToHttp().getRequest()['rawHeaders'];
+  const auth_index = rawHeaders.indexOf('Authorization');
 
-      return user;
-    }
-    return null;
-  },
-);
+  if (auth_index !== -1) {
+    const token = rawHeaders[auth_index + 1].replace('Bearer ', '');
+    let user = jwt.verify(token, process.env.SECRET_KEY)['user'];
+    user = {
+      id: user['sub'],
+      login_id: user['login_id'],
+      name: user['name'],
+    };
+    return user;
+  }
+  return null;
+});

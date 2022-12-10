@@ -3,16 +3,15 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
 import { UserRepository } from 'src/repository/user.repository';
 import * as bcryptjs from 'bcryptjs';
-import { JwtService } from '@nestjs/jwt';
 import { IPayload } from './context/types';
 import { CreateSocialUserDto } from 'src/dto/user/create-social-user.dto';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService,
   ) {}
 
   async sendEmail(email: string) {
@@ -27,10 +26,10 @@ export class AuthService {
         text: `signup code is : ${code}`, // plaintext body
         html: `signup code is : <b>${code}</b>`, // HTML body content
       })
-      .then((success) => {
+      .then(success => {
         console.log(success);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log(err);
       });
     return code;
@@ -40,22 +39,21 @@ export class AuthService {
     return await this.userRepository.checkEmail(email);
   }
 
+  async checkLoginId(login_id: string) {
+    return await this.userRepository.checkLoginId(login_id);
+  }
+
   async signupWithEmail(createUserDto: CreateUserDto) {
     const password: string = createUserDto.password;
     const salt = bcryptjs.genSaltSync(10);
     const hashedPassword = bcryptjs.hashSync(password, salt);
 
-    const user = await this.userRepository.signupWithEmail(
-      createUserDto,
-      hashedPassword,
-    );
+    const user = await this.userRepository.signupWithEmail(createUserDto, hashedPassword);
     return await this.login(user);
   }
 
   async signupWithSocial(createSocialUserDto: CreateSocialUserDto) {
-    const user = await this.userRepository.signupWithSocial(
-      createSocialUserDto,
-    );
+    const user = await this.userRepository.signupWithSocial(createSocialUserDto);
     return await this.login(user);
   }
 
@@ -79,7 +77,7 @@ export class AuthService {
       login_id: user.login_id,
       name: user.name,
     };
-    return this.jwtService.sign({ user: payload });
+    return jwt.sign({ user: payload }, process.env.SECRET_KEY);
   }
 
   async googleLogin(user: object) {
@@ -105,7 +103,6 @@ export class AuthService {
     if (!user) {
       return new ForbiddenException(403, 'No user from github');
     }
-    // console.log(user['email']);
     const data = await this.userRepository.checkLoginId(user['login_id']);
     if (!data) {
       return {

@@ -75,10 +75,7 @@ export class UserController {
         break;
 
       case 'alert':
-        if (
-          updateUserDto.comment_alert === undefined ||
-          updateUserDto.update_alert === undefined
-        ) {
+        if (updateUserDto.comment_alert === undefined || updateUserDto.update_alert === undefined) {
           throw new BadRequestException('alert must be entered');
         }
         updateData = {
@@ -103,11 +100,7 @@ export class UserController {
     @GetUser() user: User,
   ) {
     const id = user.id;
-    const data = await this.userService.updateProfileImage(
-      id,
-      image_url,
-      files,
-    );
+    const data = await this.userService.updateProfileImage(id, image_url, files);
     return {
       message: 'update profile image success',
       profile_image: data[0].profile_image,
@@ -116,10 +109,7 @@ export class UserController {
 
   @Delete('/profile_image')
   @UseGuards(JwtAuthGuard)
-  async deleteProfileImage(
-    @Query('image_url') image_url: string,
-    @GetUser() user: User,
-  ) {
+  async deleteProfileImage(@Query('image_url') image_url: string, @GetUser() user: User) {
     await this.userService.deleteProfileImage(user.id, image_url);
 
     return {
@@ -138,10 +128,7 @@ export class UserController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @HttpCode(201)
-  async follow(
-    @GetUser() user: User,
-    @Body('followee_id', ParseIntPipe) followeeId: number,
-  ) {
+  async follow(@GetUser() user: User, @Body('followee_id', ParseIntPipe) followeeId: number) {
     const followerId = user.id;
     await this.userService.follow(followerId, followeeId);
     return { message: `follow success` };
@@ -151,10 +138,7 @@ export class UserController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @HttpCode(204)
-  async unfollow(
-    @GetUser() user: User,
-    @Body('followee_id', ParseIntPipe) followeeId: number,
-  ) {
+  async unfollow(@GetUser() user: User, @Body('followee_id', ParseIntPipe) followeeId: number) {
     const followerId = user.id;
     await this.userService.unfollow(followerId, followeeId);
     return { message: `unfollow success` };

@@ -1,14 +1,4 @@
-import {
-  Controller,
-  UseGuards,
-  Post,
-  Body,
-  Get,
-  Param,
-  Patch,
-  Delete,
-  BadRequestException,
-} from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { PostService } from './post.service';
 import { GetUser } from 'src/custom-decorator/get-user.decorator';
@@ -33,10 +23,7 @@ export class PostController {
   }
 
   @Get('/:id')
-  async selectPostOne(
-    @Param('id') post_id: number,
-    @ValidateToken() user?: User,
-  ) {
+  async selectPostOne(@Param('id') post_id: number, @ValidateToken() user?: User) {
     const result = await this.postService.selectPostOne(post_id, user);
 
     return {
@@ -84,5 +71,19 @@ export class PostController {
     await this.postService.deletePost(user, post_id);
 
     return { statusCode: 200, message: 'post delete success' };
+  }
+
+  @Post('/:id/like')
+  @UseGuards(JwtAuthGuard)
+  async likePost(@Param('id') post_id: number, @GetUser() user: User) {
+    await this.postService.likePost(user.id, post_id);
+    return { statusCode: 201 };
+  }
+
+  @Delete('/:id/like')
+  @UseGuards(JwtAuthGuard)
+  async unlikePost(@Param('id') post_id: number, @GetUser() user: User) {
+    await this.postService.unlikePost(user.id, post_id);
+    return { statusCode: 204 };
   }
 }

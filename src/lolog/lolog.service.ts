@@ -1,5 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PostLikeRepository } from 'src/repository/post-like.repository';
+import { Injectable } from '@nestjs/common';
 import { PaginationDto } from 'src/dto/pagination.dto';
 import { User } from 'src/entity/user.entity';
 import { PostTagRepository } from 'src/repository/post-tag.repository';
@@ -10,7 +9,6 @@ import { UserRepository } from 'src/repository/user.repository';
 export class LologService {
   constructor(
     private postRepository: PostRepository,
-    private postLikeRepository: PostLikeRepository,
     private postTagRepository: PostTagRepository,
     private userRepository: UserRepository,
   ) {}
@@ -45,21 +43,5 @@ export class LologService {
     }
 
     return { user: get_me[0], posts, tags };
-  }
-
-  async likePost(user_id: number, post_id: number) {
-    const data = await this.postLikeRepository.getLikedPostOne(user_id, post_id);
-    if (data) {
-      throw new ConflictException('이미 좋아요 한 게시글 입니다');
-    }
-    await this.postLikeRepository.likePost(user_id, post_id);
-  }
-
-  async unlikePost(user_id: number, post_id: number) {
-    const data = await this.postLikeRepository.getLikedPostOne(user_id, post_id);
-    if (!data) {
-      throw new NotFoundException('좋아요를 하지 않은 게시글입니다');
-    }
-    await this.postLikeRepository.unlikePost(user_id, post_id);
   }
 }

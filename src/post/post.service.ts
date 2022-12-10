@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from 'src/dto/post/create-post.dto';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { User } from 'src/entity/user.entity';
 import { PostRepository } from 'src/repository/post.repository';
-import { PaginationDto } from 'src/dto/pagination.dto';
 import { PostSeriesRepository } from 'src/repository/post-series.repository';
 import { PostReadLogRepository } from 'src/repository/post-read-log.repository';
 import { CommentService } from 'src/comment/comment.service';
 import { TagRepository } from 'src/repository/tag.repository';
 import { PostTagRepository } from 'src/repository/post-tag.repository';
 import { PostViewRepository } from 'src/repository/post-view.repository';
+import { PostLikeRepository } from 'src/repository/post-like.repository';
 
 @Injectable()
 export class PostService {
@@ -21,6 +21,7 @@ export class PostService {
     private postTagRepository: PostTagRepository,
     private postViewRepository: PostViewRepository,
     private commentService: CommentService,
+    private postLikeRepository: PostLikeRepository,
   ) {}
 
   async selectPostOne(post_id: number, user?: User) {
@@ -29,7 +30,6 @@ export class PostService {
     if (user != null) {
       login_user_id = user['sub'];
     }
-
     const post = await this.postRepository.selectPostOne(login_user_id, post_id);
 
     var date = new Date();
@@ -134,5 +134,21 @@ export class PostService {
     }
 
     await this.postTagRepository.insertPostTag(insert_post_tag);
+  }
+
+  async likePost(user_id: number, post_id: number) {
+    const data = await this.postLikeRepository.getLikedPostOne(user_id, post_id);
+    if (data) {
+      throw new ConflictException('이미 좋아요 한 게시글 입니다');
+    }
+    await this.postLikeRepository.likePost(user_id, post_id);
+  }
+
+  async unlikePost(user_id: number, post_id: number) {
+    const data = await this.postLikeRepository.getLikedPostOne(user_id, post_id);
+    if (!data) {
+      throw new NotFoundException('좋아요를 하지 않은 게시글입니다');
+    }
+    await this.postLikeRepository.unlikePost(user_id, post_id);
   }
 }

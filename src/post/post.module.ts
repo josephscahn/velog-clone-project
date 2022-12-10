@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentModule } from 'src/comment/comment.module';
+import { PostLikeRepository } from 'src/repository/post-like.repository';
 import { PostReadLogRepository } from 'src/repository/post-read-log.repository';
 import { PostSeriesRepository } from 'src/repository/post-series.repository';
 import { PostTagRepository } from 'src/repository/post-tag.repository';
@@ -19,6 +20,7 @@ import { PostService } from './post.service';
       TagRepository,
       PostTagRepository,
       PostViewRepository,
+      PostLikeRepository,
     ]),
     CommentModule,
   ],
