@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SelectSereisPostsDto } from 'src/dto/series/select-series-posts.dto';
+import { UpdateSeriesDto } from 'src/dto/series/update-series.dto';
 import { User } from 'src/entity/user.entity';
 import { PostSeriesRepository } from 'src/repository/post-series.repository';
 import { SeriesRepository } from 'src/repository/series.repository';
@@ -41,7 +42,11 @@ export class SeriesService {
     return seires_posts;
   }
 
-  async updatePostSeriesSort(series_id: number, sort) {
+  async updateSeries(series_id: number, data: UpdateSeriesDto) {
+    const { sort, series_name } = data;
+
+    await this.seriesRepository.updateSeries(series_id, series_name);
+
     for (let i = 0; i < sort.length; i++) {
       await this.postSeriesRepository.updatePostSeriesSort(
         series_id,

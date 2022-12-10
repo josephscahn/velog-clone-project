@@ -40,12 +40,12 @@ export class SeriesRepository extends Repository<Series> {
         'series.id AS series_id',
         'series.user_id AS user_id',
         'post.id AS post_id',
-        'post_series.sort',
-        'series.thumbnail',
-        'post.title',
-        'post.content',
-        'post.create_at',
-        'IF(series.user_id = :user_id, 1, 0) as is_owner',
+        'post_series.sort AS sort',
+        'series.thumbnail AS thumbnail',
+        'post.title AS title',
+        'post.content AS content',
+        'post.create_at AS create_at',
+        'IF(series.user_id = :user_id, 1, 0) AS is_owner',
       ])
       .setParameter('user_id', login_user_id);
 
@@ -59,6 +59,14 @@ export class SeriesRepository extends Repository<Series> {
     }
 
     return await series_posts.getRawMany();
+  }
+
+  async updateSeries(series_id: number, seires_name: string) {
+    await this.createQueryBuilder()
+      .update(Series)
+      .set({ series_name: seires_name })
+      .where('id = :series_id', { series_id: series_id })
+      .execute();
   }
 
   async deleteSeries(series_id: number) {

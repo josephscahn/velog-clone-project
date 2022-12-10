@@ -16,6 +16,7 @@ import { User } from 'src/entity/user.entity';
 import { CreateSeriesDto } from 'src/dto/series/create-series.dto';
 import { SelectSereisPostsDto } from 'src/dto/series/select-series-posts.dto';
 import { ValidateToken } from 'src/custom-decorator/validate-token.decorator';
+import { UpdateSeriesDto } from 'src/dto/series/update-series.dto';
 
 @Controller('series')
 export class SeriesController {
@@ -56,8 +57,8 @@ export class SeriesController {
   }
 
   @Patch('/:id')
-  async updatePostSeriesSort(@Param('id') series_id: number, @Body('sort') sort) {
-    await this.seriesService.updatePostSeriesSort(series_id, sort);
+  async updateSeries(@Param('id') series_id: number, @Body() data: UpdateSeriesDto) {
+    await this.seriesService.updateSeries(series_id, data);
 
     return { statusCode: 200, message: 'seires update success' };
   }
