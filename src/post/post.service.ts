@@ -28,9 +28,15 @@ export class PostService {
     let login_user_id = -1;
 
     if (user != null) {
-      login_user_id = user['sub'];
+      login_user_id = user.id;
     }
     const post = await this.postRepository.selectPostOne(login_user_id, post_id);
+    post[0].is_writer = Number.parseInt(post[0].is_writer);
+
+    if (login_user_id > -1) {
+      post[0].is_follower = Number.parseInt(post[0].is_follower);
+      post[0].is_liked = Number.parseInt(post[0].is_liked);
+    }
 
     var date = new Date();
 
@@ -57,7 +63,7 @@ export class PostService {
     const next_post = await this.postRepository.selectNextPost(post_id, owner_user_id);
     const pre_post = await this.postRepository.selectPrePost(post_id, owner_user_id);
 
-    const interested_posts = await this.postRepository.interestedPostList();
+    const interested_posts = await this.postRepository.interestedPostList(post_id);
 
     if (owner_user_id !== login_user_id && user) {
       const exist = await this.postReadLogRepository.getReadLogBypostId(login_user_id, post_id);
@@ -150,5 +156,13 @@ export class PostService {
       throw new NotFoundException('좋아요를 하지 않은 게시글입니다');
     }
     await this.postLikeRepository.unlikePost(user_id, post_id);
+  }
+
+  async selectSaveOne(post_id: number, user_id: number) {
+    let save_one = await this.postRepository.selectSaveOne(post_id, user_id);
+
+    if (save_one[0].tags) save_one[0].tags = JSON.parse(save_one[0].tags);
+
+    return save_one;
   }
 }

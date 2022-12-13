@@ -17,7 +17,7 @@ export class LologService {
     let login_user_id = -1;
 
     if (user != null) {
-      login_user_id = user['sub'];
+      login_user_id = user.id;
     }
 
     let is_owner = false;
@@ -32,13 +32,16 @@ export class LologService {
 
     if (posts.length != 0) {
       for (let i = 0; i < posts.length; i++) {
+        posts[i].is_owner = Number.parseInt(posts[i].is_owner);
         if (posts[i].tags) {
           const to_json = JSON.parse(posts[i].tags);
 
           posts[i].tags = to_json;
         }
       }
-    } else {
+    }
+
+    if (pagination.offset == 1 && posts.length == 0) {
       posts = null;
     }
 

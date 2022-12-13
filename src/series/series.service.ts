@@ -28,7 +28,7 @@ export class SeriesService {
     let login_user_id = -1;
 
     if (user != null) {
-      login_user_id = user['sub'];
+      login_user_id = user.id;
     }
 
     const seires_posts = await this.seriesRepository.SelectSereisPosts(

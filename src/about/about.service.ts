@@ -10,10 +10,11 @@ export class AboutService {
     let login_user_id = -1;
 
     if (user != null) {
-      login_user_id = user['sub'];
+      login_user_id = user.id;
     }
 
     const about = await this.userRepository.selectAboutBlog(user_id, login_user_id);
+    about[0].is_owner = Number.parseInt(about[0].is_owner);
     return about[0];
   }
 

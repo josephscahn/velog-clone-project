@@ -11,6 +11,17 @@ import { ValidateToken } from 'src/custom-decorator/validate-token.decorator';
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @Get('/saves/:id')
+  @UseGuards(JwtAuthGuard)
+  async selectSaveOne(@GetUser() user: User, @Param('id') post_id: number) {
+    const result = await this.postService.selectSaveOne(post_id, user.id);
+
+    return {
+      statusCode: 200,
+      post: result,
+    };
+  }
+
   @Get('/saves')
   @UseGuards(JwtAuthGuard)
   async selectSaves(@GetUser() user: User) {

@@ -38,6 +38,7 @@ export class SeriesRepository extends Repository<Series> {
       .where('series.id = :series_id', { series_id: series_id })
       .select([
         'series.id AS series_id',
+        'series.series_name AS series_name',
         'series.user_id AS user_id',
         'post.id AS post_id',
         'post_series.sort AS sort',

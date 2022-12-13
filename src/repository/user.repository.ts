@@ -93,10 +93,15 @@ export class UserRepository extends Repository<User> {
   }
 
   async selectAboutBlog(user_id: number, login_user_id: number) {
-    return await this.query(
-      `SELECT id AS user_id, about_blog, IF(id = ?, 1, 0) as is_owner FROM user WHERE id = ?`,
-      [login_user_id, user_id],
-    );
+    const about_blog = this.createQueryBuilder('user')
+      .select([
+        'user.id AS user_id',
+        'user.about_blog AS about_blog',
+        'IF(`user`.`id` = :login_user_id, 1, 0) AS is_owner',
+      ])
+      .setParameter('login_user_id', login_user_id)
+      .where('user.id = :user_id', { user_id: user_id });
+    return await about_blog.getRawMany();
   }
 
   async withdrawal(user_id: number) {
