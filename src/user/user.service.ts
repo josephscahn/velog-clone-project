@@ -122,7 +122,9 @@ export class UserService {
   }
 
   async getMe(id: number) {
-    return await this.userRepository.getMe(id, id);
+    let data = await this.userRepository.getMe(id, id);
+    data.is_follower = Number.parseInt(data.is_follower);
+    return data;
   }
 
   async updateAboutBlog(user_id: number, about_blog: string) {

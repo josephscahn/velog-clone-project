@@ -26,7 +26,11 @@ export class LologService {
       is_owner = true;
     }
 
-    const get_me = await this.userRepository.getMe(user_id, login_user_id);
+    let get_me = await this.userRepository.getMe(user_id, login_user_id);
+    if (login_user_id >= 0) {
+      get_me.is_follower = Number.parseInt(get_me.is_follower);
+    }
+
     let posts = await this.postRepository.selectPostList(user_id, is_owner, pagination);
     const tags = await this.postTagRepository.selectTagListByUserId(user_id);
 

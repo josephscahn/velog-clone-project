@@ -150,7 +150,7 @@ export class AuthController {
   // @UseGuards(AuthGuard('google'))
   async googleAuth(@Request() req) {
     return {
-      redirect_url: `https://accounts.google.com/o/oauth2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=http://localhost:8000/auth/google/callback&scope=email profile&response_type=code`,
+      redirect_url: `https://accounts.google.com/o/oauth2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=http://localhost:5173/auth/google/callback&scope=email profile&response_type=code`,
     };
   }
 
