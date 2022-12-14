@@ -26,16 +26,27 @@ export class PostService {
 
   async selectPostOne(post_id: number, user?: User) {
     let login_user_id = -1;
+    let owner_user_id = -1;
 
     if (user != null) {
       login_user_id = user.id;
     }
-    const post = await this.postRepository.selectPostOne(login_user_id, post_id);
-    post[0].is_writer = Number.parseInt(post[0].is_writer);
+    let post = await this.postRepository.selectPostOne(login_user_id, post_id);
 
-    if (login_user_id > -1) {
-      post[0].is_follower = Number.parseInt(post[0].is_follower);
-      post[0].is_liked = Number.parseInt(post[0].is_liked);
+    if (post) {
+      owner_user_id = post[0].user_id;
+      if (post[0].tags) {
+        post[0].tags = JSON.parse(post[0].tags);
+      }
+
+      post[0].is_writer = Number.parseInt(post[0].is_writer);
+
+      if (login_user_id > -1) {
+        post[0].is_follower = Number.parseInt(post[0].is_follower);
+        post[0].is_liked = Number.parseInt(post[0].is_liked);
+      }
+    } else {
+      throw new NotFoundException('해당 게시글을 찾을 수 없습니다.');
     }
 
     var date = new Date();
@@ -52,12 +63,6 @@ export class PostService {
       await this.postViewRepository.insertPostView(post_id);
     } else {
       await this.postViewRepository.updatePostView(post_id, date_str);
-    }
-
-    const owner_user_id = post[0].user_id;
-
-    if (post[0].tags) {
-      post[0].tags = JSON.parse(post[0].tags);
     }
 
     const next_post = await this.postRepository.selectNextPost(post_id, owner_user_id);

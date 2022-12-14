@@ -49,7 +49,7 @@ export class PostRepository extends Repository<Post> {
       ])
       .setParameter('userId', login_user_id)
       .where('post.id = :post_id', { post_id: post_id })
-      .andWhere("post.status REGEXP '1|2'");
+      .andWhere('post.status <> 3');
 
     if (login_user_id > -1) {
       query
