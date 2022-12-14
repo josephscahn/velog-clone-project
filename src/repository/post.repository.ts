@@ -206,24 +206,25 @@ export class PostRepository extends Repository<Post> {
         'post.comment_count',
         'post.likes',
         'post.views',
-      ]);
+      ])
+      .where('post.status = 1');
 
     switch (period) {
       case PeriodType.TODAY:
-        main_posts.where('DAYOFMONTH(post.create_at) = DAYOFMONTH(CURDATE())');
+        main_posts.andWhere('DAYOFMONTH(post.create_at) = DAYOFMONTH(CURDATE())');
         break;
       case PeriodType.WEEK:
-        main_posts.where(
+        main_posts.andWhere(
           'DATE(post.create_at) BETWEEN DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND CURDATE()',
         );
         break;
       case PeriodType.MONTH:
-        main_posts.where(
+        main_posts.andWhere(
           'DATE(post.create_at) BETWEEN DATE_ADD(CURDATE(), INTERVAL -30 DAY) AND CURDATE()',
         );
         break;
       case PeriodType.YEAR:
-        main_posts.where(
+        main_posts.andWhere(
           'DATE(post.create_at) BETWEEN DATE_ADD(CURDATE(), INTERVAL -365 DAY) AND CURDATE()',
         );
         break;
