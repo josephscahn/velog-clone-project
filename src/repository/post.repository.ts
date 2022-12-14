@@ -122,7 +122,6 @@ export class PostRepository extends Repository<Post> {
         'post.comment_count',
         'post.likes',
         'post.status',
-        'IF(:is_owner, 1, 0) AS is_owner',
       ])
       .setParameter('is_owner', is_owner)
       .groupBy('post.id')

@@ -99,7 +99,9 @@ export class UserRepository extends Repository<User> {
         'social_info.twitter AS social_info_twitter',
         'social_info.facebook AS social_info_facebook',
         'social_info.url AS social_info_url',
+        'IF(user.id = :login_user_id, 1, 0) AS is_owner',
       ])
+      .setParameter('login_user_id', login_user_id)
       .where('user.id = :id', { id: id });
 
     if (login_user_id > -1) {
