@@ -13,7 +13,11 @@ import {
   Request,
   Get,
   HttpStatus,
+  Response,
+  Res,
+  Redirect,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { CreateSocialUserDto } from 'src/dto/user/create-social-user.dto';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
@@ -23,6 +27,8 @@ import { FacebookAuthGuard } from './guards/facbook-oauth.guard';
 import { GithubAuthGuard } from './guards/github-oauth.guard';
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { GithubStrategy } from './strategies/github.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Controller('auth')
 export class AuthController {
@@ -56,10 +62,10 @@ export class AuthController {
   @HttpCode(201)
   async signupWithEmail(@Query('type') type: string, @Body() createUserDto: CreateUserDto) {
     try {
-      let token: string = '';
+      let result: object = {};
       switch (type) {
         case 'email':
-          token = await this.authService.signupWithEmail(createUserDto);
+          result = await this.authService.signupWithEmail(createUserDto);
           break;
         case 'github':
           const createGithubUserDto: CreateSocialUserDto = {
@@ -69,7 +75,7 @@ export class AuthController {
             profile_image: createUserDto.profile_image,
             provider: type,
           };
-          token = await this.authService.signupWithSocial(createGithubUserDto);
+          result = await this.authService.signupWithSocial(createGithubUserDto);
           break;
         case 'google':
           const createGoogleUserDto: CreateSocialUserDto = {
@@ -80,7 +86,7 @@ export class AuthController {
             profile_image: createUserDto.profile_image,
             provider: type,
           };
-          token = await this.authService.signupWithSocial(createGoogleUserDto);
+          result = await this.authService.signupWithSocial(createGoogleUserDto);
           break;
         case 'facebook':
           const createFacebookUserDto: CreateSocialUserDto = {
@@ -90,14 +96,21 @@ export class AuthController {
             profile_image: createUserDto.profile_image,
             provider: type,
           };
-          token = await this.authService.signupWithSocial(createFacebookUserDto);
+          result = await this.authService.signupWithSocial(createFacebookUserDto);
           break;
         default:
           throw new BadRequestException(
             'Type must to be `email` or `github` or `google` or `facebook`',
           );
       }
-      return { message: 'signup & login success', token };
+      console.log(result);
+      // const {token, id, profile_image, ...} = result;
+      return {
+        message: 'signup & login success',
+        token: result['token'],
+        id: result['id'],
+        profile_image: result['profile_image'],
+      };
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') {
         throw new ConflictException('이메일 또는 로그인 아이디가 중복 되었습니다');
@@ -111,8 +124,13 @@ export class AuthController {
   @Post('/login')
   @HttpCode(201)
   async login(@GetUser() user: User) {
-    const token = await this.authService.login(user);
-    return { message: 'login success', token };
+    const data = await this.authService.login(user);
+    return {
+      message: 'login success',
+      token: data.token,
+      id: data.id,
+      profile_image: data.profile_image,
+    };
   }
 
   @Get('/github/callback')
@@ -124,7 +142,17 @@ export class AuthController {
 
   @Get('/github')
   @UseGuards(GithubAuthGuard)
-  async githubAuth(@Request() req) {}
+  async githubAuth(@Request() req) {
+    return HttpStatus.OK;
+  }
+
+  @Get('/google')
+  // @UseGuards(AuthGuard('google'))
+  async googleAuth(@Request() req) {
+    return {
+      redirect_url: `https://accounts.google.com/o/oauth2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=http://localhost:8000/auth/google/callback&scope=email profile&response_type=code`,
+    };
+  }
 
   @Get('/google/callback')
   @UseGuards(GoogleOAuthGuard)
@@ -132,10 +160,6 @@ export class AuthController {
     const data = this.authService.googleLogin(req.user);
     return data;
   }
-
-  @Get('/google')
-  @UseGuards(GoogleOAuthGuard)
-  async googleAuth(@Request() req) {}
 
   @Get('/facebook/callback')
   @UseGuards(FacebookAuthGuard)

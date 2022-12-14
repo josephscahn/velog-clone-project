@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { AuthGuard } from '@nestjs/passport';
@@ -19,10 +20,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const rawHeaders = request['rawHeaders'];
     const authIndex = rawHeaders.indexOf('Authorization');
     if (authIndex === -1) {
-      throw new HttpException('Token 전송 안됨', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('Token 전송 안됨');
     }
 
     const token = rawHeaders[authIndex + 1].replace('Bearer ', '');
+    if (!token) {
+      throw new UnauthorizedException('Token 전송 안됨');
+    }
     request.user = this.validateToken(token);
     return true;
   }

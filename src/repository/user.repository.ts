@@ -19,6 +19,15 @@ export class UserRepository extends Repository<User> {
     return await this.findOne({ id: user_id });
   }
 
+  async getUserProfileImage(user_id: number) {
+    return await this.query(
+      `
+        SELECT user.profile_image FROM user WHERE user.id = ?;
+      `,
+      [user_id],
+    );
+  }
+
   async signupWithEmail(createUserDto: CreateUserDto, hashedPassword: string) {
     const { email, name, about_me, login_id } = createUserDto;
     const user = this.create({
@@ -71,17 +80,34 @@ export class UserRepository extends Repository<User> {
       .execute();
   }
 
-  async getMe(id: number) {
-    return await this.query(
-      `
-      SELECT count(follow.id) as follow_count, u.id, u.profile_image, u.name, u.about_me, u.title, u.email, u.comment_alert, u.update_alert, si.email social_info_email, si.github social_info_github, si. twitter social_info_twitter, si.facebook social_info_facebook, si.url social_info_url
-        FROM user u
-        LEFT JOIN social_info si ON si.userId = u.id
-        LEFT JOIN follow ON u.id = follow.followee_id
-        WHERE u.id = ?;
-      `,
-      [id],
-    );
+  async getMe(id: number, login_user_id: number) {
+    let getMe = await this.createQueryBuilder('user')
+      .leftJoin('social_info', 'social_info', 'social_info.user = user.id')
+      .leftJoin('follow', 'follow', 'follow.followee_id = user.id')
+      .select([
+        'count(follow.id) AS follow_count',
+        'user.id',
+        'user.profile_image',
+        'user.name',
+        'user.about_me',
+        'user.title',
+        'user.email',
+        'user.comment_alert',
+        'user.update_alert',
+        'social_info.email AS social_info_email',
+        'social_info.github AS social_info_github',
+        'social_info.twitter AS social_info_twitter',
+        'social_info.facebook AS social_info_facebook',
+        'social_info.url AS social_info_url',
+      ])
+      .where('user.id = :id', { id: id });
+
+    if (login_user_id > -1) {
+      getMe
+        .addSelect(['IF(follow.follower_id = :user_id, 1, 0) AS is_follower'])
+        .setParameter('user_id', login_user_id);
+    }
+    return await getMe.getRawOne();
   }
 
   async updateAboutBlog(user_id: number, about_blog: string) {

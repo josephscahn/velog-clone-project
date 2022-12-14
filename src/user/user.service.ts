@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SocialInfoDto } from 'src/dto/user/update-user.dto';
-import { User } from 'src/entity/user.entity';
 import { deleteImageFile, getImageURL } from 'src/lib/multerOptions';
 import { FollowRepository } from 'src/repository/follow.repository';
 import { SocialInfoRepository } from 'src/repository/social-info.repository';
@@ -76,6 +75,11 @@ export class UserService {
       throw new ConflictException('Already follow');
     }
     await this.followRepository.follow(followerId, followeeId);
+    if (await this.followRepository.findOne({ follower: followerId, followee: followeeId })) {
+      return 1;
+    } else {
+      return 0;
+    }
   }
 
   async unfollow(followerId: number, followeeId: number) {
@@ -92,6 +96,11 @@ export class UserService {
     }
 
     await this.followRepository.unfollow(followerId, followeeId);
+    if (await this.followRepository.findOne({ follower: followerId, followee: followeeId })) {
+      return 1;
+    } else {
+      return 0;
+    }
   }
 
   async getMyFollowee(id: number) {
@@ -113,7 +122,7 @@ export class UserService {
   }
 
   async getMe(id: number) {
-    return await this.userRepository.getMe(id);
+    return await this.userRepository.getMe(id, id);
   }
 
   async updateAboutBlog(user_id: number, about_blog: string) {

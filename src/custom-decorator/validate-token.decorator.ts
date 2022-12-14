@@ -3,6 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import { User } from 'src/entity/user.entity';
 
 export const ValidateToken = createParamDecorator((_data, ctx: ExecutionContext): User => {
+  const req = ctx.switchToHttp().getRequest();
   const rawHeaders = ctx.switchToHttp().getRequest()['rawHeaders'];
   const auth_index = rawHeaders.indexOf('Authorization');
 

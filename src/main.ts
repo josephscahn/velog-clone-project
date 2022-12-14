@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-import { ValidationPipe } from '@nestjs/common';
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from 'config/config.service';
@@ -11,6 +11,11 @@ async function bootstrap() {
   await makeOrmConfig();
 
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: ['http://localhost:5173'],
+    credentials: true,
+    optionsSuccessStatus: HttpStatus.OK,
+  });
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 
@@ -21,8 +26,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  app.enableCors();
 
   await app.listen(process.env.SERVER_POST);
 }

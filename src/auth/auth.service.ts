@@ -77,7 +77,12 @@ export class AuthService {
       login_id: user.login_id,
       name: user.name,
     };
-    return jwt.sign({ user: payload }, process.env.SECRET_KEY);
+    const profile_image = await this.userRepository.getUserProfileImage(user.id);
+    return {
+      token: jwt.sign({ user: payload }, process.env.SECRET_KEY),
+      id: user.id,
+      profile_image: profile_image[0].profile_image,
+    };
   }
 
   async googleLogin(user: object) {

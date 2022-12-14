@@ -130,18 +130,20 @@ export class UserController {
   @HttpCode(201)
   async follow(@GetUser() user: User, @Body('followee_id', ParseIntPipe) followeeId: number) {
     const followerId = user.id;
-    await this.userService.follow(followerId, followeeId);
-    return { message: `follow success` };
+    console.log('user', user);
+    console.log('followee_id', followeeId);
+    const data = await this.userService.follow(followerId, followeeId);
+    return { message: `follow success`, is_follower: data };
   }
 
   @Delete('/follow')
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
-  @HttpCode(204)
+  @HttpCode(200)
   async unfollow(@GetUser() user: User, @Body('followee_id', ParseIntPipe) followeeId: number) {
     const followerId = user.id;
-    await this.userService.unfollow(followerId, followeeId);
-    return { message: `unfollow success` };
+    const data = await this.userService.unfollow(followerId, followeeId);
+    return { message: `unfollow success`, is_follower: data };
   }
 
   @Get('/follow')

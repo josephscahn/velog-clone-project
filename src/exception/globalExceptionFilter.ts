@@ -8,6 +8,7 @@ import {
   NotFoundException,
   ConflictException,
   Logger,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { QueryFailedError } from 'typeorm';
@@ -44,10 +45,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         status = (exception as any).response.statusCode;
         message = (exception as any).response.message;
         break;
+      case ForbiddenException:
+        status = (exception as any).response.statusCode;
+        message = (exception as any).response.message;
+        break;
 
       default:
         status = HttpStatus.INTERNAL_SERVER_ERROR;
     }
+    console.log(exception);
     Logger.error('statusCode: ' + status, 'message: ' + message);
     response.status(status).json({
       statusCode: status,
