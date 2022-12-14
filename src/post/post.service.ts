@@ -163,6 +163,6 @@ export class PostService {
 
     if (save_one[0].tags) save_one[0].tags = JSON.parse(save_one[0].tags);
 
-    return save_one;
+    return save_one[0];
   }
 }

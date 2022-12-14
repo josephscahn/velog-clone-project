@@ -38,6 +38,7 @@ export class PostRepository extends Repository<Post> {
         'post.title AS title',
         'post.status AS status',
         'post.content AS content',
+        'post.thumbnail AS thumbnail',
         'post.create_at AS create_at',
         'post.comment_count AS comment_count',
         'post.likes AS likes',
@@ -47,7 +48,8 @@ export class PostRepository extends Repository<Post> {
         'post.description as description',
       ])
       .setParameter('userId', login_user_id)
-      .andWhere('post.id = :post_id', { post_id: post_id });
+      .where('post.id = :post_id', { post_id: post_id })
+      .andWhere("post.status REGEXP '1|2'");
 
     if (login_user_id > -1) {
       query
