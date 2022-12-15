@@ -42,9 +42,9 @@ export class SeriesRepository extends Repository<Series> {
         'series.user_id AS user_id',
         'post.id AS post_id',
         'post_series.sort AS sort',
-        'series.thumbnail AS thumbnail',
+        'post.thumbnail AS thumbnail',
         'post.title AS title',
-        'post.content AS content',
+        'post.description AS description',
         'post.create_at AS create_at',
         'IF(series.user_id = :user_id, 1, 0) AS is_owner',
       ])
