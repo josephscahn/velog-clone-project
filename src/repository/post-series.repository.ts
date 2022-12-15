@@ -60,7 +60,7 @@ export class PostSeriesRepository extends Repository<PostSeries> {
         'post.id AS post_id',
         'post.title AS title',
       ])
-      .where('series.id = (SELECT series_id FROM post_series WHERE post_id = :post_id)', {
+      .where('series.id = (SELECT series_id FROM post_series WHERE post_id = :post_id LIMIT 1)', {
         post_id: post_id,
       })
       .orderBy('post_series.sort', 'ASC')

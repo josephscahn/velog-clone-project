@@ -92,7 +92,7 @@ export class PostService {
       await this.createTag(data.tags, post_id);
     }
 
-    if (data.series_id) {
+    if (data.series_id && data.status != 3) {
       await this.postSeriesRepository.createPostSeries(post_id, data.series_id);
     }
 
