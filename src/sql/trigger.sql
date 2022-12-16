@@ -22,10 +22,20 @@ CREATE TRIGGER update_post_count_by_insert
 AFTER INSERT  
 ON post_series 
 FOR EACH ROW 
- 
+
 BEGIN
   DECLARE get_post_count INT DEFAULT 0;
+  DECLARE get_post_thumbnail VARCHAR(3000) DEFAULT '';
+  DECLARE get_series_thumbnail VARCHAR(3000) DEFAULT '';
+  
   SET get_post_count = (SELECT COUNT(*) FROM post_series WHERE series_id = NEW.series_id);
+  SET get_post_thumbnail = (SELECT thumbnail FROM post WHERE id = (SELECT post_id FROM post_series WHERE id = NEW.id AND sort = 1));
+  SET get_series_thumbnail = (SELECT thumbnail FROM series WHERE id = NEW.series_id);
+  
+  IF get_series_thumbnail IS NULL THEN
+  	UPDATE series SET thumbnail = get_post_thumbnail WHERE id = NEW.series_id;
+  END IF;
+  
   UPDATE series SET post_count = get_post_count WHERE id = NEW.series_id;
 END $$
  

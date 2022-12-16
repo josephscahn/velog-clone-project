@@ -14,14 +14,18 @@ export class PostSeriesRepository extends Repository<PostSeries> {
       .execute();
   }
 
-  async getPostSeriesId(post_id: number) {
-    return await this.query(
-      `SELECT id FROM post_series
-       WHERE series_id = (SELECT series_id FROM post_series WHERE post_id = ? LIMIT 1)
-       AND post_id <> ?
-       ORDER BY sort ASC`,
-      [post_id, post_id],
-    );
+  async getPostSeries(post_id: number) {
+    const post_series = await this.query(`SELECT series_id FROM post_series WHERE post_id = ?`, [
+      post_id,
+    ]);
+
+    return post_series[0];
+  }
+
+  async getPostSeriesId(series_id: number) {
+    const ids = await this.query(`SELECT id FROM post_series WHERE series_id = ?`, [series_id]);
+
+    return ids;
   }
 
   async updateSort(sort: number, id: number) {

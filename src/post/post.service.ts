@@ -107,18 +107,20 @@ export class PostService {
       await this.createTag(data.tags, post_id);
     }
 
-    if (data.series_id == null) {
-      const post_series = await this.postSeriesRepository.getPostSeriesId(post_id);
+    const series_id = await this.postSeriesRepository.getPostSeries(post_id);
 
+    if (!series_id && data.series_id) {
+      await this.postSeriesRepository.createPostSeries(post_id, data.series_id);
+    }
+
+    if (series_id && data.series_id == null) {
       await this.postSeriesRepository.deletePostSeries(post_id, null);
 
-      if (post_series.length != 0) {
-        for (let i = 0; i < post_series.length; i++) {
-          await this.postSeriesRepository.updateSort(i + 1, post_series[i].id);
-        }
+      const post_series_id = await this.postSeriesRepository.getPostSeriesId(series_id.series_id);
+
+      for (let i = 0; i < post_series_id.length; i++) {
+        await this.postSeriesRepository.updateSort(i + 1, post_series_id[i].id);
       }
-    } else {
-      await this.postSeriesRepository.createPostSeries(post_id, data.series_id);
     }
 
     return post_id;
