@@ -191,6 +191,7 @@ export class PostRepository extends Repository<Post> {
     period: PeriodType,
     offset: number,
     limit: number,
+    user: User,
   ) {
     let main_posts = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
@@ -239,6 +240,9 @@ export class PostRepository extends Repository<Post> {
         main_posts.groupBy('post.id');
         main_posts.orderBy('SUM(post.likes + post.views)', 'DESC');
         break;
+      case MainPostsType.FOLLOW:
+        main_posts.leftJoin('follow', 'follow', 'post.user_id = follow.followee_id');
+        main_posts.andWhere('follow.follower_id = :user_id', { user_id: user.id });
     }
 
     main_posts.offset(offset * limit - limit);

@@ -1,6 +1,7 @@
 export enum MainPostsType {
   RECENT = 'recent',
   TREND = 'trend',
+  FOLLOW = 'follow',
 }
 
 export enum PeriodType {
