@@ -33,9 +33,8 @@ export class ConfigService {
       cli: {
         migrationsDir: 'src/migration',
       },
-      synchronize: true,
-      logging: true,
-      // ssl: !this.isDevelopment(),
+      synchronize: false,
+      logging: false,
     };
   }
 }
