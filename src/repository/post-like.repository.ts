@@ -27,7 +27,7 @@ export class PostLikeRepository extends Repository<PostLike> {
         'post.id AS post_id',
         'post.likes',
         'post.title',
-        'post.thumbnail',
+        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
         'post.content',
         'post.comment_count',
         'post.create_at AS create_at',

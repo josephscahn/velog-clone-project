@@ -28,7 +28,7 @@ export class PostReadLogRepository extends Repository<PostReadLog> {
       .select([
         'post.id AS post_id',
         'post.title',
-        'post.thumbnail',
+        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
         'post.likes',
         'post.comment_count',
         'post.create_at AS create_at',
@@ -36,6 +36,7 @@ export class PostReadLogRepository extends Repository<PostReadLog> {
         'user.name',
         'user.profile_image',
       ])
+      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
       .where('post_read_log.user_id = :user_id', { user_id })
       .groupBy('post.id')
       .getRawMany();

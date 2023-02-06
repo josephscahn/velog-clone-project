@@ -114,7 +114,7 @@ export class PostRepository extends Repository<Post> {
       .select([
         'user.id as user_id',
         'post.id as post_id',
-        'post.thumbnail',
+        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
         'post.title',
         'post.description',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
@@ -123,6 +123,7 @@ export class PostRepository extends Repository<Post> {
         'post.likes',
         'post.status',
       ])
+      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
       .setParameter('is_owner', is_owner)
       .groupBy('post.id')
       .orderBy('post.create_at', 'DESC');
@@ -200,7 +201,7 @@ export class PostRepository extends Repository<Post> {
         'user.profile_image',
         'user.login_id',
         'post.id AS post_id',
-        'post.thumbnail',
+        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
         'post.title',
         'post.description',
         'post.create_at AS create_at',
@@ -208,6 +209,7 @@ export class PostRepository extends Repository<Post> {
         'post.likes',
         'post.views',
       ])
+      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
       .where('post.status = 1');
 
     switch (period) {
@@ -261,7 +263,7 @@ export class PostRepository extends Repository<Post> {
         'user.id AS user_id',
         'user.profile_image',
         'user.login_id',
-        'post.thumbnail',
+        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
         'post.title',
         'post.description',
         'post.create_at AS create_at',
@@ -270,6 +272,7 @@ export class PostRepository extends Repository<Post> {
         'post.views',
       ])
       .distinct(true)
+      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
       .where('post.id <> :post_id', { post_id: post_id })
       .orderBy('RAND()')
       .limit(12);
@@ -287,13 +290,14 @@ export class PostRepository extends Repository<Post> {
         'user.profile_image',
         'user.login_id',
         'post.id AS post_id',
-        'post.thumbnail',
+        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
         'post.title',
         'post.description',
         'post.create_at AS create_at',
         'post.comment_count',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
+      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
       .andWhere(
         new Brackets(qb => {
           qb.orWhere('post.title REGEXP :keywords', { keywords: keywords })

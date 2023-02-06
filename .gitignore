@@ -38,3 +38,6 @@ lerna-debug.log*
 node_modules
 ormconfig.json
 public
+
+.env_개발용
+.env_배포용

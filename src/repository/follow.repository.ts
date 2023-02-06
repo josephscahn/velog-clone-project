@@ -56,13 +56,14 @@ export class FollowRepository extends Repository<Follow> {
         'user.profile_image',
         'user.login_id',
         'post.id AS post_id',
-        'post.thumbnail',
+        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
         'post.title',
         'post.content',
         'post.create_at',
         'post.comment_count',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
+      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
       .where('follow.follower_id = :id', { id: id })
       .getRawMany();
   }

@@ -22,7 +22,7 @@ export class Post extends BaseEntity {
   @Column({ length: 200 })
   title: string;
 
-  @Column({ length: 3000 })
+  @Column({ type: 'text' })
   content: string;
 
   @Column({ type: 'tinyint' })

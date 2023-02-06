@@ -12,7 +12,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: ['http://3.34.1.213:5173'],
+    origin: [process.env.URL],
     credentials: true,
     optionsSuccessStatus: HttpStatus.OK,
   });
@@ -27,7 +27,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.SERVER_POST);
+  await app.listen(process.env.SERVER_PORT);
 }
 
 async function makeOrmConfig() {

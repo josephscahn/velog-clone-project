@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 import { BadRequestException } from '@nestjs/common';
-import { existsSync, fstat, mkdirSync, unlinkSync } from 'fs';
+import { existsSync, mkdirSync, unlinkSync } from 'fs';
 import { diskStorage } from 'multer';
 import uuidRandom from './uuidRandom';
 
@@ -35,9 +35,7 @@ export const multerOptions = {
 };
 
 const createImageURL = (file): string => {
-  const serverAddress: string = 'http://localhost:' + process.env.SERVER_POST;
-
-  return `${serverAddress}/public/${file.filename}`;
+  return `/public/${file.filename}`;
 };
 
 export const getImageURL = (files: File[]) => {
