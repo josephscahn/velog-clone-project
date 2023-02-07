@@ -44,11 +44,7 @@ export class AuthService {
   }
 
   async signupWithEmail(createUserDto: CreateUserDto) {
-    const password: string = createUserDto.password;
-    const salt = bcryptjs.genSaltSync(10);
-    const hashedPassword = bcryptjs.hashSync(password, salt);
-
-    const user = await this.userRepository.signupWithEmail(createUserDto, hashedPassword);
+    const user = await this.userRepository.signupWithEmail(createUserDto);
     return await this.login(user);
   }
 

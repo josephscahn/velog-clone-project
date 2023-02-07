@@ -28,12 +28,12 @@ export class UserRepository extends Repository<User> {
     );
   }
 
-  async signupWithEmail(createUserDto: CreateUserDto, hashedPassword: string) {
-    const { email, name, about_me, login_id } = createUserDto;
+  async signupWithEmail(createUserDto: CreateUserDto) {
+    const { email, name, about_me, login_id, password } = createUserDto;
     const user = this.create({
       email,
       name,
-      password: hashedPassword,
+      password,
       login_id,
       about_me,
       title: login_id + '.log',

@@ -1,10 +1,5 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm';
+import { BaseEntity, BeforeInsert, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import * as bcryptjs from 'bcryptjs';
 
 @Entity({ name: 'user' })
 @Unique(['email'])
@@ -45,4 +40,9 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   provider: string;
+
+  @BeforeInsert()
+  hashPassword() {
+    this.password = bcryptjs.hashSync(this.password, 10);
+  }
 }
