@@ -35,6 +35,7 @@ export class PostLikeRepository extends Repository<PostLike> {
         'user.name',
         'user.profile_image',
       ])
+      .setParameter('server_url', process.env.IMAGE_URL)
       .where('post_like.user_id = :user_id', { user_id })
       .groupBy('post.id')
       .getRawMany();

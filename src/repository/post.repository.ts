@@ -123,7 +123,7 @@ export class PostRepository extends Repository<Post> {
         'post.likes',
         'post.status',
       ])
-      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
+      .setParameter('server_url', process.env.IMAGE_URL)
       .setParameter('is_owner', is_owner)
       .groupBy('post.id')
       .orderBy('post.create_at', 'DESC');
@@ -209,7 +209,7 @@ export class PostRepository extends Repository<Post> {
         'post.likes',
         'post.views',
       ])
-      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
+      .setParameter('server_url', process.env.IMAGE_URL)
       .where('post.status = 1');
 
     switch (period) {
@@ -272,7 +272,7 @@ export class PostRepository extends Repository<Post> {
         'post.views',
       ])
       .distinct(true)
-      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
+      .setParameter('server_url', process.env.IMAGE_URL)
       .where('post.id <> :post_id', { post_id: post_id })
       .orderBy('RAND()')
       .limit(12);
@@ -297,7 +297,7 @@ export class PostRepository extends Repository<Post> {
         'post.comment_count',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
-      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
+      .setParameter('server_url', process.env.IMAGE_URL)
       .andWhere(
         new Brackets(qb => {
           qb.orWhere('post.title REGEXP :keywords', { keywords: keywords })

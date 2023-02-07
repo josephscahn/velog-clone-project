@@ -63,7 +63,7 @@ export class FollowRepository extends Repository<Follow> {
         'post.comment_count',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
-      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
+      .setParameter('server_url', process.env.IMAGE_URL)
       .where('follow.follower_id = :id', { id: id })
       .getRawMany();
   }

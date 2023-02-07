@@ -3,17 +3,15 @@ import { deleteImageFile, getImageURL } from 'src/lib/multerOptions';
 
 @Injectable()
 export class UploadService {
-  thumbnailUpload(files: File[], image_url: string) {
-    if (image_url) {
-      const file_name = image_url.replace('http://localhost:8000/public/', '');
+  thumbnailUpload(files: File[], file_name: string) {
+    if (file_name) {
       deleteImageFile(file_name);
     }
 
     return getImageURL(files);
   }
 
-  thumbnailDelete(image_url: string) {
-    const file_name = image_url.replace('http://localhost:8000/public/', '');
+  thumbnailDelete(file_name: string) {
     deleteImageFile(file_name);
   }
 }

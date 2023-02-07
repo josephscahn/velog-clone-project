@@ -36,7 +36,7 @@ export class PostReadLogRepository extends Repository<PostReadLog> {
         'user.name',
         'user.profile_image',
       ])
-      .setParameter('server_url', 'http://localhost:' + process.env.SERVER_PORT)
+      .setParameter('server_url', process.env.IMAGE_URL)
       .where('post_read_log.user_id = :user_id', { user_id })
       .groupBy('post.id')
       .getRawMany();

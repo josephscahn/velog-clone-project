@@ -35,7 +35,7 @@ export const multerOptions = {
 };
 
 const createImageURL = (file): string => {
-  return `/public/${file.filename}`;
+  return `${file.filename}`;
 };
 
 export const getImageURL = (files: File[]) => {
