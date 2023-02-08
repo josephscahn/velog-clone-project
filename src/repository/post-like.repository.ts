@@ -22,18 +22,19 @@ export class PostLikeRepository extends Repository<PostLike> {
   async getLikedList(user_id: number) {
     return await this.createQueryBuilder('post_like')
       .leftJoin('post', 'post', 'post_like.post_id = post.id')
+      .leftJoin('comments', 'comments', 'comments.post_id = post.id')
       .leftJoin('user', 'user', 'post.user = user.id')
       .select([
         'post.id AS post_id',
         'post.likes',
         'post.title',
-        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
+        'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) as post_thumbnail',
         'post.content',
-        'post.comment_count',
+        'COUNT(comments.id) AS post_comment_count',
         'post.create_at AS create_at',
         'user.id AS user_id',
         'user.name',
-        'user.profile_image',
+        'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) as user_profile_image',
       ])
       .setParameter('server_url', process.env.IMAGE_URL)
       .where('post_like.user_id = :user_id', { user_id })

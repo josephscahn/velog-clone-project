@@ -87,7 +87,7 @@ export class UserRepository extends Repository<User> {
       .select([
         'count(follow.id) AS follow_count',
         'user.id AS id',
-        'user.profile_image AS profile_image',
+        'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) AS profile_image',
         'user.name AS name',
         'user.about_me AS about_me',
         'user.title AS title',
@@ -101,6 +101,7 @@ export class UserRepository extends Repository<User> {
         'social_info.url AS social_info_url',
         'IF(user.id = :login_user_id, 1, 0) AS is_owner',
       ])
+      .setParameter('server_url', process.env.IMAGE_URL)
       .setParameter('login_user_id', login_user_id)
       .where('user.id = :id', { id: id });
 

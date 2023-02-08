@@ -11,11 +11,12 @@ export class SeriesRepository extends Repository<Series> {
       .where('series.user_id = :user_id', { user_id: user_id })
       .select([
         'series.id AS series_id',
-        'series.thumbnail',
+        'IF(series.thumbnail=null, null, CONCAT(:server_url, series.thumbnail)) as series_thumbnail',
         'series.series_name',
-        'series.post_count',
         'series.update_at',
+        'COUNT(post_series.id) AS series_post_count',
       ])
+      .setParameter('server_url', process.env.IMAGE_URL)
       .groupBy('series.id')
       .orderBy('series.create_at', 'ASC');
 
@@ -42,12 +43,13 @@ export class SeriesRepository extends Repository<Series> {
         'series.user_id AS user_id',
         'post.id AS post_id',
         'post_series.sort AS sort',
-        'post.thumbnail AS thumbnail',
+        'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) AS thumbnail',
         'post.title AS title',
         'post.description AS description',
         'post.create_at AS create_at',
         'IF(series.user_id = :user_id, 1, 0) AS is_owner',
       ])
+      .setParameter('server_url', process.env.IMAGE_URL)
       .setParameter('user_id', login_user_id);
 
     switch (sort) {

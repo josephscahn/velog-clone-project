@@ -10,6 +10,7 @@ import {
   OneToMany,
   JoinTable,
 } from 'typeorm';
+import { Comments } from './comment.entity';
 import { PostTag } from './post-tag.entity';
 import { User } from './user.entity';
 import { TagsView } from './view-tags.entity';
@@ -36,9 +37,6 @@ export class Post extends BaseEntity {
 
   @Column({ default: 0 })
   likes: number;
-
-  @Column({ default: 0 })
-  comment_count: number;
 
   @Column()
   post_url: string;

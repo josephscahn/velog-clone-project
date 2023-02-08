@@ -25,20 +25,17 @@ export class Series {
   @Column({ nullable: true })
   thumbnail: string;
 
-  @Column({ default: 0 })
-  post_count: number;
-
   @CreateDateColumn()
   create_at: Date;
 
   @UpdateDateColumn()
   update_at: Date;
 
-  @ManyToOne((type) => User, { onDelete: 'CASCADE' })
+  @ManyToOne(type => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: number;
 
-  @OneToMany((type) => PostSeries, (post_series) => post_series.series)
+  @OneToMany(type => PostSeries, post_series => post_series.series)
   @JoinTable({
     joinColumn: {
       name: 'post_series',

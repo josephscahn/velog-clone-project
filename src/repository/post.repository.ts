@@ -28,25 +28,27 @@ export class PostRepository extends Repository<Post> {
     let query = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
       .leftJoin('post.tags', 'tags')
+      .leftJoin('comments', 'comments', 'comments.post_id = post.id')
       .select([
         'user.id AS user_id',
         'user.login_id AS login_id',
         'user.name AS name',
-        'user.profile_image AS profile_image',
+        'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) AS profile_image',
         'user.about_me AS about_me',
         'post.id AS post_id',
         'post.title AS title',
         'post.status AS status',
         'post.content AS content',
-        'post.thumbnail AS thumbnail',
+        'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) AS thumbnail',
         'post.create_at AS create_at',
-        'post.comment_count AS comment_count',
+        'COUNT(comments.id) AS comment_count',
         'post.likes AS likes',
         'IF(post.user_id = :userId, 1, 0) AS is_writer',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
         'post.post_url as post_url',
         'post.description as description',
       ])
+      .setParameter('server_url', process.env.IMAGE_URL)
       .setParameter('userId', login_user_id)
       .where('post.id = :post_id', { post_id: post_id })
       .andWhere('post.status <> 3');
@@ -110,16 +112,17 @@ export class PostRepository extends Repository<Post> {
       .leftJoin('post.user', 'user')
       .leftJoin('post.tags', 'tags')
       .leftJoin('post.post_tag', 'post_tag')
+      .leftJoin('comments', 'comments', 'comments.post_id = post.id')
       .where(`post.user_id = :user_id`, { user_id: user_id })
       .select([
         'user.id as user_id',
         'post.id as post_id',
-        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
+        'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) as post_thumbnail',
         'post.title',
         'post.description',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
         'post.create_at AS create_at',
-        'post.comment_count',
+        'COUNT(comments.id) AS post_comment_count',
         'post.likes',
         'post.status',
       ])
@@ -196,18 +199,19 @@ export class PostRepository extends Repository<Post> {
   ) {
     let main_posts = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
+      .leftJoin('comments', 'comments', 'comments.post_id = post.id')
       .select([
         'user.id AS user_id',
-        'user.profile_image',
+        'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) as user_profile_image',
         'user.login_id',
         'post.id AS post_id',
-        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
+        'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) as post_thumbnail',
         'post.title',
         'post.description',
         'post.create_at AS create_at',
-        'post.comment_count',
         'post.likes',
         'post.views',
+        'COUNT(comments.id) AS post_comment_count',
       ])
       .setParameter('server_url', process.env.IMAGE_URL)
       .where('post.status = 1');
@@ -258,16 +262,17 @@ export class PostRepository extends Repository<Post> {
       .leftJoin('post.user', 'user')
       .leftJoin('post.post_tag', 'post_tag')
       .leftJoin('tag', 'tag', 'post_tag.tag_id = tag.id')
+      .leftJoin('comments', 'comments', 'comments.post_id = post.id')
       .select([
         'post.id AS post_id',
         'user.id AS user_id',
-        'user.profile_image',
+        'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) as user_profile_image',
         'user.login_id',
-        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
+        'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) as post_thumbnail',
         'post.title',
         'post.description',
         'post.create_at AS create_at',
-        'post.comment_count',
+        'COUNT(comments.id) AS post_comment_count',
         'post.likes',
         'post.views',
       ])
@@ -285,16 +290,17 @@ export class PostRepository extends Repository<Post> {
       .leftJoin('post.tags', 'tags')
       .leftJoin('post_tag', 'post_tag', 'post.id = post_tag.post_id')
       .leftJoin('tag', 'tag', 'post_tag.tag_id = tag.id')
+      .leftJoin('comments', 'comments', 'comments.post_id = post.id')
       .select([
         'user.id AS user_id',
-        'user.profile_image',
+        'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) as user_profile_image',
         'user.login_id',
         'post.id AS post_id',
-        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
+        'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) as post_thumbnail',
         'post.title',
         'post.description',
         'post.create_at AS create_at',
-        'post.comment_count',
+        'COUNT(comments.id) AS post_comment_count',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
       .setParameter('server_url', process.env.IMAGE_URL)

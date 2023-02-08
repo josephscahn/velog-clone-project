@@ -34,7 +34,7 @@ export class FollowRepository extends Repository<Follow> {
             "name", user.name, 
             "title", user.title, 
             "about_me", user.about_me, 
-            "profile_image", user.profile_image
+            "profile_image", IF(user.profile_image=null, null, CONCAT('${process.env.IMAGE_URL}', user.profile_image))
           )
         ) AS follow
         FROM follow
@@ -50,17 +50,18 @@ export class FollowRepository extends Repository<Follow> {
     return await this.createQueryBuilder('follow')
       .leftJoin('user', 'user', 'follow.followee_id = user.id')
       .leftJoin('post', 'post', 'follow.followee_id = post.user_id')
+      .leftJoin('comments', 'comments', 'comments.post_id = post.id')
       .leftJoin('post.tags', 'tags')
       .select([
         'user.id AS user_id',
-        'user.profile_image',
+        'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) as user_profile_image',
         'user.login_id',
         'post.id AS post_id',
-        'CONCAT(:server_url, post.thumbnail) as post_thumbnail',
+        'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) as post_thumbnail',
         'post.title',
         'post.content',
         'post.create_at',
-        'post.comment_count',
+        'COUNT(comments.id) AS post_comment_count',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
       ])
       .setParameter('server_url', process.env.IMAGE_URL)

@@ -43,19 +43,15 @@ export class UserService {
     return await this.socialInfoRepository.getSocialInfoByUserId(id, keys);
   }
 
-  async updateProfileImage(id: number, image_url: string, files: File[]) {
-    if (image_url) {
-      const file_name = image_url.replace('http://localhost:8000/public/', '');
+  async updateProfileImage(id: number, file_name: string, files: File[]) {
+    if (file_name) {
       deleteImageFile(file_name);
     }
-    const url = getImageURL(files)[0];
-    await this.userRepository.updateProfileImage(id, url);
 
     return this.userRepository.getUserByUserId(id, ['profile_image']);
   }
 
-  async deleteProfileImage(id: number, image_url: string) {
-    const file_name = image_url.replace('http://localhost:8000/public/', '');
+  async deleteProfileImage(id: number, file_name: string) {
     deleteImageFile(file_name);
 
     await this.userRepository.deleteProfileImage(id);
