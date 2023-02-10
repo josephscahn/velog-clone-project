@@ -66,6 +66,7 @@ export class FollowRepository extends Repository<Follow> {
       ])
       .setParameter('server_url', process.env.IMAGE_URL)
       .where('follow.follower_id = :id', { id: id })
+      .groupBy('post.id')
       .getRawMany();
   }
 }

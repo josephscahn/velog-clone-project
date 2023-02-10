@@ -32,6 +32,7 @@ export class PostRepository extends Repository<Post> {
       .select([
         'user.id AS user_id',
         'user.login_id AS login_id',
+        'user.title as lolog_title',
         'user.name AS name',
         'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) AS profile_image',
         'user.about_me AS about_me',
@@ -240,6 +241,7 @@ export class PostRepository extends Repository<Post> {
     switch (type) {
       case MainPostsType.RECENT:
         main_posts.orderBy('post.create_at', 'DESC');
+        main_posts.groupBy('post.id');
         break;
       case MainPostsType.TREND:
         main_posts.andWhere('post.likes > 0 AND post.views > 0');
@@ -279,6 +281,7 @@ export class PostRepository extends Repository<Post> {
       .distinct(true)
       .setParameter('server_url', process.env.IMAGE_URL)
       .where('post.id <> :post_id', { post_id: post_id })
+      .groupBy('post.id')
       .orderBy('RAND()')
       .limit(12);
     return await posts.getRawMany();
