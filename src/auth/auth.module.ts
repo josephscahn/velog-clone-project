@@ -10,9 +10,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from 'src/user/user.module';
 import { LocalStrategy } from './strategies/local.strategy';
-import { GoogleStrategy } from './strategies/google.strategy';
 import { GithubStrategy } from './strategies/github.strategy';
 import { FacebookStrategy } from './strategies/facebook.strategy';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -33,6 +33,7 @@ import { FacebookStrategy } from './strategies/facebook.strategy';
       secret: process.env.SECRET_KEY,
     }),
     UserModule,
+    HttpModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -40,7 +41,6 @@ import { FacebookStrategy } from './strategies/facebook.strategy';
     UserService,
     LocalStrategy,
     JwtStrategy,
-    GoogleStrategy,
     GithubStrategy,
     FacebookStrategy,
   ],

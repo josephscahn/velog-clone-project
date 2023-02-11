@@ -1,3 +1,4 @@
+import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   Body,
@@ -13,11 +14,8 @@ import {
   Request,
   Get,
   HttpStatus,
-  Response,
-  Res,
-  Redirect,
+  HttpException,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { CreateSocialUserDto } from 'src/dto/user/create-social-user.dto';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
@@ -25,14 +23,11 @@ import { User } from 'src/entity/user.entity';
 import { AuthService } from './auth.service';
 import { FacebookAuthGuard } from './guards/facbook-oauth.guard';
 import { GithubAuthGuard } from './guards/github-oauth.guard';
-import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { GithubStrategy } from './strategies/github.strategy';
-import { GoogleStrategy } from './strategies/google.strategy';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly http: HttpService) {}
 
   @Post('/email')
   async checkEmail(@Body('email') email: string) {
@@ -146,18 +141,42 @@ export class AuthController {
     return HttpStatus.OK;
   }
 
-  @Get('/google')
-  // @UseGuards(AuthGuard('google'))
-  async googleAuth(@Request() req) {
-    return {
-      redirect_url: `https://accounts.google.com/o/oauth2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.URL}/auth/google/callback&scope=email profile&response_type=code`,
-    };
-  }
-
   @Get('/google/callback')
-  @UseGuards(GoogleOAuthGuard)
-  async googleAuthRedirect(@Request() req) {
-    const data = this.authService.googleLogin(req.user);
+  async googleAuthRedirect(@Query() query, @Request() req) {
+    const code = query.code;
+
+    const url = `https://oauth2.googleapis.com/token?code=${code}&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_CLIENT_SECRET}&redirect_uri=${process.env.GOOGLE_REDIRECT_URI}&grant_type=${process.env.GOOGLE_GRANT_TYPE}`;
+
+    const access_token = await this.http.axiosRef
+      .post(url, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      })
+      .then(el => {
+        return el.data.access_token;
+      })
+      .catch(err => {
+        console.log(err);
+        throw new HttpException('google oauth access_token err', 500);
+      });
+
+    const google_api_url = `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${access_token}`;
+
+    const user_info = await this.http.axiosRef
+      .get(google_api_url, {
+        headers: {
+          authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then(el => {
+        return el.data;
+      })
+      .catch(err => {
+        console.log(err);
+        throw new HttpException('google oauth user_info err', 500);
+      });
+
+    const data = await this.authService.googleLogin(user_info);
+
     return data;
   }
 
