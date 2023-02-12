@@ -6,12 +6,14 @@ import * as bcryptjs from 'bcryptjs';
 import { IPayload } from './context/types';
 import { CreateSocialUserDto } from 'src/dto/user/create-social-user.dto';
 import * as jwt from 'jsonwebtoken';
+import { UploadService } from 'src/upload/upload.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly userRepository: UserRepository,
+    private readonly uploadService: UploadService,
   ) {}
 
   async sendEmail(email: string) {
@@ -49,7 +51,10 @@ export class AuthService {
   }
 
   async signupWithSocial(createSocialUserDto: CreateSocialUserDto) {
-    const user = await this.userRepository.signupWithSocial(createSocialUserDto);
+    const profile_image: string = await this.uploadService.linkedProfileImageUpload(
+      createSocialUserDto.profile_image,
+    );
+    const user = await this.userRepository.signupWithSocial(createSocialUserDto, profile_image);
     return await this.login(user);
   }
 

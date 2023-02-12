@@ -18,12 +18,7 @@ export const multerOptions = {
 
   storage: diskStorage({
     destination: (request, file, callback) => {
-      const uploadPath: string = 'public';
-
-      if (!existsSync(uploadPath)) {
-        // public 폴더가 존재하지 않을시, 생성합니다.
-        mkdirSync(uploadPath);
-      }
+      const uploadPath: string = getUploadPath();
 
       callback(null, uploadPath);
     },
@@ -32,6 +27,16 @@ export const multerOptions = {
       callback(null, uuidRandom(file));
     },
   }),
+};
+
+export const getUploadPath = () => {
+  const uploadPath: string = 'public';
+
+  if (!existsSync(uploadPath)) {
+    // public 폴더가 존재하지 않을시, 생성합니다.
+    mkdirSync(uploadPath);
+  }
+  return uploadPath;
 };
 
 const createImageURL = (file): string => {

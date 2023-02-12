@@ -98,8 +98,6 @@ export class AuthController {
             'Type must to be `email` or `github` or `google` or `facebook`',
           );
       }
-      console.log(result);
-      // const {token, id, profile_image, ...} = result;
       return {
         message: 'signup & login success',
         token: result['token'],
@@ -110,6 +108,7 @@ export class AuthController {
       if (err.code === 'ER_DUP_ENTRY') {
         throw new ConflictException('이메일 또는 로그인 아이디가 중복 되었습니다');
       } else {
+        console.log(err);
         throw new InternalServerErrorException();
       }
     }

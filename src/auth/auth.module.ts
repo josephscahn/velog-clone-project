@@ -13,6 +13,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { GithubStrategy } from './strategies/github.strategy';
 import { FacebookStrategy } from './strategies/facebook.strategy';
 import { HttpModule } from '@nestjs/axios';
+import { UploadService } from 'src/upload/upload.service';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { HttpModule } from '@nestjs/axios';
     JwtStrategy,
     GithubStrategy,
     FacebookStrategy,
+    UploadService,
   ],
   exports: [AuthService],
 })

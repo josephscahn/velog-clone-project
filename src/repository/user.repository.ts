@@ -41,8 +41,8 @@ export class UserRepository extends Repository<User> {
     return await this.save(user);
   }
 
-  async signupWithSocial(createSocialUserDto: CreateSocialUserDto) {
-    const { name, email, login_id, about_me, provider, profile_image } = createSocialUserDto;
+  async signupWithSocial(createSocialUserDto: CreateSocialUserDto, profile_image: string) {
+    const { name, email, login_id, about_me, provider } = createSocialUserDto;
     const user = this.create({
       name,
       email,

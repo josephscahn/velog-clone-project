@@ -43,6 +43,8 @@ export class User extends BaseEntity {
 
   @BeforeInsert()
   hashPassword() {
-    this.password = bcryptjs.hashSync(this.password, 10);
+    if (this.password) {
+      this.password = bcryptjs.hashSync(this.password, 10);
+    }
   }
 }
