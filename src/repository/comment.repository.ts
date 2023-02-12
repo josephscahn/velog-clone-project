@@ -96,4 +96,12 @@ export class CommentRepository extends Repository<Comments> {
 
     await comment.execute();
   }
+
+  async getCommentCount(post_id: number) {
+    const comment = this.createQueryBuilder('comments')
+      .select('COUNT(*) as comment_count')
+      .where('post_id = :post_id', { post_id: post_id });
+
+    return await comment.getRawMany();
+  }
 }

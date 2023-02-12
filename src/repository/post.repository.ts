@@ -28,7 +28,6 @@ export class PostRepository extends Repository<Post> {
     let query = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
       .leftJoin('post.tags', 'tags')
-      .leftJoin('comments', 'comments', 'comments.post_id = post.id')
       .select([
         'user.id AS user_id',
         'user.login_id AS login_id',
@@ -42,7 +41,6 @@ export class PostRepository extends Repository<Post> {
         'post.content AS content',
         'IF(post.thumbnail=null, null, CONCAT(:server_url, post.thumbnail)) AS thumbnail',
         'post.create_at AS create_at',
-        'COUNT(comments.id) AS comment_count',
         'post.likes AS likes',
         'IF(post.user_id = :userId, 1, 0) AS is_writer',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',

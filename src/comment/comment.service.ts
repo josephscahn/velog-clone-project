@@ -8,20 +8,22 @@ export class CommentService {
   constructor(private commentRepository: CommentRepository) {}
 
   async selectCommentList(post_id: number, login_user_id: number) {
-    let result = await this.commentRepository.selectCommentList(post_id, login_user_id);
+    let comments = await this.commentRepository.selectCommentList(post_id, login_user_id);
 
-    for (let i = 0; i < result.length; i++) {
-      result[i].is_comments_writer = Number.parseInt(result[i].is_comments_writer);
-      if (result[i].nested_comments) {
-        const to_json = JSON.parse(result[i].nested_comments);
+    for (let i = 0; i < comments.length; i++) {
+      comments[i].is_comments_writer = Number.parseInt(comments[i].is_comments_writer);
+      if (comments[i].nested_comments) {
+        const to_json = JSON.parse(comments[i].nested_comments);
 
-        result[i].nested_comments = to_json;
+        comments[i].nested_comments = to_json;
       }
     }
 
-    if (result.length == 0) return null;
+    const comment_count = await this.commentRepository.getCommentCount(post_id);
 
-    return result;
+    if (comments.length == 0) return null;
+
+    return { comments, comment_count };
   }
 
   async createComment(data: CommentsDto, post_id: number, user_id: number) {
