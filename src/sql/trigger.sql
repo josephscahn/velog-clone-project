@@ -53,34 +53,3 @@ BEGIN
 END $$
  
 DELIMITER ;
-
--- 게시글 조회 할 때마다 view_count 합계
-DELIMITER $$
- 
-CREATE TRIGGER update_view_count_by_insert
-AFTER INSERT  
-ON post_view 
-FOR EACH ROW 
- 
-BEGIN
-  DECLARE get_view_count INT DEFAULT 0;
-  SET get_view_count = (SELECT SUM(view_count) FROM post_view WHERE post_id = NEW.post_id);
-  UPDATE post SET views = get_view_count WHERE id = NEW.post_id;
-END $$
- 
-DELIMITER ;
-
-DELIMITER $$
- 
-CREATE TRIGGER update_view_count_by_update
-AFTER UPDATE  
-ON post_view 
-FOR EACH ROW 
- 
-BEGIN
-  DECLARE get_view_count INT DEFAULT 0;
-  SET get_view_count = (SELECT SUM(view_count) FROM post_view WHERE post_id = NEW.post_id);
-  UPDATE post SET views = get_view_count WHERE id = NEW.post_id;
-END $$
- 
-DELIMITER ;

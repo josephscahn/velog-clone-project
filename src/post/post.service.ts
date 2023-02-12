@@ -8,7 +8,6 @@ import { PostReadLogRepository } from 'src/repository/post-read-log.repository';
 import { CommentService } from 'src/comment/comment.service';
 import { TagRepository } from 'src/repository/tag.repository';
 import { PostTagRepository } from 'src/repository/post-tag.repository';
-import { PostViewRepository } from 'src/repository/post-view.repository';
 import { PostLikeRepository } from 'src/repository/post-like.repository';
 
 @Injectable()
@@ -19,7 +18,6 @@ export class PostService {
     private postReadLogRepository: PostReadLogRepository,
     private tagRepository: TagRepository,
     private postTagRepository: PostTagRepository,
-    private postViewRepository: PostViewRepository,
     private commentService: CommentService,
     private postLikeRepository: PostLikeRepository,
   ) {}
@@ -49,22 +47,6 @@ export class PostService {
       throw new NotFoundException('해당 게시글을 찾을 수 없습니다.');
     }
 
-    var date = new Date();
-
-    var year = date.getFullYear();
-    var month = ('0' + (date.getMonth() + 1)).slice(-2);
-    var day = ('0' + date.getDate()).slice(-2);
-
-    var date_str = year + '-' + month + '-' + day;
-
-    const post_view = await this.postViewRepository.selectPostViewDate(post_id, date_str);
-
-    if (!post_view) {
-      await this.postViewRepository.insertPostView(post_id);
-    } else {
-      await this.postViewRepository.updatePostView(post_id, date_str);
-    }
-
     const next_post = await this.postRepository.selectNextPost(post_id, owner_user_id);
     const pre_post = await this.postRepository.selectPrePost(post_id, owner_user_id);
 
@@ -81,6 +63,8 @@ export class PostService {
     const comments = await this.commentService.selectCommentList(post_id, login_user_id);
 
     const series = await this.postSeriesRepository.selectPostSeriesList(post_id);
+
+    await this.postRepository.updateViews(post_id);
 
     return { post, next_post, pre_post, interested_posts, comments, series };
   }

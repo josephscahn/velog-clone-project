@@ -14,15 +14,6 @@ export class MainService {
       throw new BadRequestException('로그인 한 유저만 팔로우 확인 가능');
     }
 
-    if (query.type == MainPostsType.FOLLOW) {
-      const data = await this.followRepository.getFolloweePosts(user.id);
-
-      for (let i = 0; i < data.length; i++) {
-        data[i].tags = JSON.parse(data[i].tags);
-      }
-      return data;
-    }
-
     const posts = await this.postRepository.selectPostListForMain(
       query.type,
       query.period,

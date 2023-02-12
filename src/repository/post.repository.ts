@@ -56,7 +56,7 @@ export class PostRepository extends Repository<Post> {
 
     if (login_user_id > -1) {
       query
-        .leftJoin('follow', 'follow', 'follow.followee_id = user.id')
+        .leftJoin('follow', 'follow', 'follow.followee_id = post.user_id AND follower_id = :userId')
         .leftJoin(
           'post_like',
           'post_like',
@@ -251,6 +251,8 @@ export class PostRepository extends Repository<Post> {
       case MainPostsType.FOLLOW:
         main_posts.leftJoin('follow', 'follow', 'post.user_id = follow.followee_id');
         main_posts.andWhere('follow.follower_id = :user_id', { user_id: user.id });
+        main_posts.orderBy('post.create_at', 'DESC');
+        main_posts.groupBy('post.id');
     }
 
     main_posts.offset(offset * limit - limit);
@@ -349,5 +351,9 @@ export class PostRepository extends Repository<Post> {
       .orderBy('post.create_at', 'DESC');
 
     return await save_one.getRawMany();
+  }
+
+  async updateViews(post_id: number) {
+    await this.query(`UPDATE post SET views = views+1 WHERE id = ?`, [post_id]);
   }
 }
