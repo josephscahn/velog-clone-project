@@ -82,7 +82,7 @@ export class AuthService {
     return {
       token: jwt.sign({ user: payload }, process.env.SECRET_KEY),
       id: user.id,
-      profile_image: profile_image[0].profile_image,
+      profile_image: profile_image.profile_image,
     };
   }
 

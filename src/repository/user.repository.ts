@@ -20,12 +20,15 @@ export class UserRepository extends Repository<User> {
   }
 
   async getUserProfileImage(user_id: number) {
-    return await this.query(
-      `
-        SELECT user.profile_image FROM user WHERE user.id = ?;
-      `,
-      [user_id],
-    );
+    const profile_image = await this.createQueryBuilder('user')
+      .select(
+        'IF(user.profile_image=null, null, CONCAT(:server_url, user.profile_image)) as profile_image',
+      )
+      .where('user.id = :user_id')
+      .setParameters({ server_url: process.env.IMAGE_URL, user_id: user_id })
+      .getRawOne();
+
+    return profile_image;
   }
 
   async signupWithEmail(createUserDto: CreateUserDto) {
