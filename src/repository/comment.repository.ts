@@ -60,12 +60,12 @@ export class CommentRepository extends Repository<Comments> {
     return comments;
   }
 
-  async createComment(data: CommentsDto, post_id: number, user_id: number) {
+  async createComment(content: string, parent_id: number, post_id: number, user_id: number) {
     const comment = this.create({
       user: user_id,
       post: post_id,
-      content: data.content,
-      comment: data.parent_id,
+      content: content,
+      comment: parent_id,
     });
 
     await this.save(comment);

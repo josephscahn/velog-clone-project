@@ -19,16 +19,19 @@ export class CommentService {
       }
     }
 
+    if (comments.length == 0) {
+      return { comments: null, comment_count: 0 };
+    }
+
     const comment_count = await this.commentRepository.getCommentCount(post_id);
 
-    if (comments.length == 0) return null;
-
-    return { comments, comment_count };
+    return { comments, comment_count: comment_count[0].comment_count };
   }
 
   async createComment(data: CommentsDto, post_id: number, user_id: number) {
-    await this.commentRepository.createComment(data, post_id, user_id);
-
+    let { content, parent_id } = data;
+    if (parent_id === 0 || !parent_id) parent_id = null;
+    await this.commentRepository.createComment(content, parent_id, post_id, user_id);
     const comments = await this.selectCommentList(post_id, user_id);
     return comments;
   }

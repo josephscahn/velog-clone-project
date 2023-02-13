@@ -44,7 +44,7 @@ export class PostController {
       next_post: result.next_post[0],
       pre_post: result.pre_post[0],
       comments: result.comments.comments,
-      comment_count: result.comments.comment_count[0].comment_count,
+      comment_count: result.comments.comment_count,
       interested: result.interested_posts,
     };
   }

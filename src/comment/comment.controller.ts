@@ -22,7 +22,7 @@ export class CommentController {
     return {
       statusCode: 201,
       comments: result.comments,
-      comment_count: result.comment_count[0].comment_count,
+      comment_count: result.comment_count,
     };
   }
 
@@ -38,7 +38,7 @@ export class CommentController {
       statusCode: 200,
       message: 'comment update success',
       comments: result.comments,
-      comment_count: result.comment_count[0].comment_count,
+      comment_count: result.comment_count,
     };
   }
 
@@ -49,7 +49,7 @@ export class CommentController {
       statusCode: 200,
       message: 'comment delete success',
       comments: result.comments,
-      comment_count: result.comment_count[0].comment_count,
+      comment_count: result.comment_count,
     };
   }
 }
