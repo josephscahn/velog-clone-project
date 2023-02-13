@@ -1,14 +1,10 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Get, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ValidateToken } from 'src/custom-decorator/validate-token.decorator';
 import { PaginationDto } from 'src/dto/pagination.dto';
 import { User } from 'src/entity/user.entity';
 import { SearchService } from './search.service';
+import { SetResponse } from 'src/common/response';
+import { ResponseMessage } from 'src/common/response-message.model';
 
 @Controller('search')
 export class SearchController {
@@ -28,12 +24,14 @@ export class SearchController {
       limit: limit,
       tag_id: null,
     };
-    const data = await this.searchService.mainSearch(
-      keyword,
-      user_id,
-      user,
-      pagination,
-    );
-    return data;
+    const data = await this.searchService.mainSearch(keyword, user_id, user, pagination);
+
+    const response = SetResponse('검색한 게시글들의', ResponseMessage.READ_SUCCESS);
+
+    return {
+      statusCode: response[0],
+      message: response[1],
+      posts: data,
+    };
   }
 }

@@ -1,0 +1,16 @@
+export enum ResponseMessage {
+  SEND_EMAIL_SUCCESS = '인증번호 이메일 전송에 선공했습니다.',
+  AVAILABLE_ID = '사용 가능한 로그인 아이디 입니다.',
+  LOGIN_SUCCESS = ' 로그인에 성공했습니다.',
+  SIGNUP_SUCCESS = ' 회원가입에 성공했습니다.',
+  FOLLOW_SUCCESS = '님에게 팔로우 성공했습니다.',
+  UNFOLLOW_SUCCESS = '님과의 팔로우가 취소됐습니다.',
+  POST_LIKE_SUCCESS = '번 게시글의 좋아요를 성공했습니다.',
+  POST_UNLIKE_SUCCESS = '번 게시글의 좋아요를 취소했습니다.',
+  CREATE_SUCCESS = ' 작성에 성공했습니다.',
+  READ_SUCCESS = ' 조회에 성공했습니다.',
+  UPDATE_SUCCESS = ' 수정에 성공했습니다.',
+  DELETE_SUCCESS = ' 삭제에 성공했습니다.',
+  ADD_SUCCESS1 = ' 추가에 성공했습니다.',
+  ADD_SUCCESS2 = ' 등록에 성공했습니다.',
+}

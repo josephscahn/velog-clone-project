@@ -2,6 +2,8 @@ import { Controller, UseInterceptors, UploadedFiles, Post, Query, Delete } from 
 import { UploadService } from './upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/lib/multerOptions';
+import { SetResponse } from 'src/common/response';
+import { ResponseMessage } from 'src/common/response-message.model';
 
 @Controller('uploads')
 export class UploadController {
@@ -12,8 +14,11 @@ export class UploadController {
   thumbnailUpload(@UploadedFiles() files: File[], @Query('image_url') image_url: string) {
     const result = this.uploadService.thumbnailUpload(files, image_url);
 
+    const response = SetResponse('썸네일', ResponseMessage.ADD_SUCCESS2);
+
     return {
-      statusCode: 200,
+      statusCode: response[0],
+      message: response[1],
       imageUrl: result,
     };
   }
@@ -22,9 +27,11 @@ export class UploadController {
   thumbnailDelete(@Query('image_url') image_url: string) {
     this.uploadService.thumbnailDelete(image_url);
 
+    const response = SetResponse('썸네일', ResponseMessage.DELETE_SUCCESS);
+
     return {
-      statusCode: 200,
-      message: 'image delete success',
+      statusCode: response[0],
+      message: response[1],
     };
   }
 }

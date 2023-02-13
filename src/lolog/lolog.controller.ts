@@ -3,6 +3,8 @@ import { ValidateToken } from 'src/custom-decorator/validate-token.decorator';
 import { User } from 'src/entity/user.entity';
 import { LologService } from './lolog.service';
 import { PaginationDto } from 'src/dto/pagination.dto';
+import { SetResponse } from 'src/common/response';
+import { ResponseMessage } from 'src/common/response-message.model';
 
 @Controller('lolog')
 export class LologController {
@@ -16,6 +18,14 @@ export class LologController {
   ) {
     const result = await this.lologService.getLolog(user_id, pagination, user);
 
-    return { statusCode: 200, user: result.user, posts: result.posts, tags: result.tags };
+    const response = SetResponse('롤로그', ResponseMessage.READ_SUCCESS);
+
+    return {
+      statusCode: response[0],
+      message: response[1],
+      user: result.user,
+      posts: result.posts,
+      tags: result.tags,
+    };
   }
 }

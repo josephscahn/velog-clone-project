@@ -6,6 +6,8 @@ import { User } from 'src/entity/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdatePostDto } from 'src/dto/post/update-post.dto';
 import { ValidateToken } from 'src/custom-decorator/validate-token.decorator';
+import { SetResponse } from 'src/common/response';
+import { ResponseMessage } from 'src/common/response-message.model';
 
 @Controller('posts')
 export class PostController {
@@ -16,8 +18,11 @@ export class PostController {
   async selectSaveOne(@GetUser() user: User, @Param('id') post_id: number) {
     const result = await this.postService.selectSaveOne(post_id, user.id);
 
+    const response = SetResponse(post_id + '번 임시글', ResponseMessage.READ_SUCCESS);
+
     return {
-      statusCode: 200,
+      statusCode: response[0],
+      message: response[1],
       post: result,
     };
   }
@@ -27,8 +32,11 @@ export class PostController {
   async selectSaves(@GetUser() user: User) {
     const result = await this.postService.selectSaves(user.id);
 
+    const response = SetResponse('임시글', ResponseMessage.READ_SUCCESS);
+
     return {
-      statusCode: 200,
+      statusCode: response[0],
+      message: response[1],
       saves: result,
     };
   }
@@ -37,8 +45,11 @@ export class PostController {
   async selectPostOne(@Param('id') post_id: number, @ValidateToken() user?: User) {
     const result = await this.postService.selectPostOne(post_id, user);
 
+    const response = SetResponse(post_id + '번 게시글', ResponseMessage.READ_SUCCESS);
+
     return {
-      statusCode: 200,
+      statusCode: response[0],
+      message: response[1],
       series: result.series,
       post: result.post[0],
       next_post: result.next_post[0],
@@ -54,9 +65,11 @@ export class PostController {
   async createPost(@GetUser() user: User, @Body() data: CreatePostDto) {
     const result = await this.postService.createPost(user, data);
 
+    const response = SetResponse('게시글', ResponseMessage.CREATE_SUCCESS);
+
     return {
-      statusCode: 201,
-      message: 'post create success',
+      statusCode: response[0],
+      message: response[1],
       post_id: result,
     };
   }
@@ -70,9 +83,11 @@ export class PostController {
   ) {
     const result = await this.postService.updatePost(user, data, post_id);
 
+    const response = SetResponse('게시글', ResponseMessage.UPDATE_SUCCESS);
+
     return {
-      statusCode: 200,
-      message: 'post update success',
+      statusCode: response[0],
+      message: response[1],
       post_id: result,
     };
   }
@@ -82,20 +97,28 @@ export class PostController {
   async deletePost(@GetUser() user: User, @Param('id') post_id: number) {
     await this.postService.deletePost(user, post_id);
 
-    return { statusCode: 200, message: 'post delete success' };
+    const response = SetResponse('게시글', ResponseMessage.DELETE_SUCCESS);
+
+    return { statusCode: response[0], message: response[1] };
   }
 
   @Post('/:id/like')
   @UseGuards(JwtAuthGuard)
   async likePost(@Param('id') post_id: number, @GetUser() user: User) {
     await this.postService.likePost(user.id, post_id);
-    return { statusCode: 201 };
+
+    const response = SetResponse(String(post_id), ResponseMessage.POST_LIKE_SUCCESS);
+
+    return { statusCode: response[0], message: response[1] };
   }
 
   @Delete('/:id/like')
   @UseGuards(JwtAuthGuard)
   async unlikePost(@Param('id') post_id: number, @GetUser() user: User) {
     await this.postService.unlikePost(user.id, post_id);
-    return { statusCode: 204 };
+
+    const response = SetResponse(String(post_id), ResponseMessage.POST_UNLIKE_SUCCESS);
+
+    return { statusCode: response[0], message: response[1] };
   }
 }
