@@ -118,10 +118,6 @@ export class UserService {
     return data;
   }
 
-  async updateAboutBlog(user_id: number, about_blog: string) {
-    await this.userRepository.updateAboutBlog(user_id, about_blog);
-  }
-
   async withdrawal(user_id: number) {
     const exist = await this.userRepository.findOne({ id: user_id });
     if (!exist) {
