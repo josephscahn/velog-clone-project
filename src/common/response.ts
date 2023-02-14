@@ -9,6 +9,8 @@ export const SetResponse = (name: string, type: ResponseMessage) => {
     type == ResponseMessage.ADD_SUCCESS1
   ) {
     return [HttpStatus.CREATED, name + type];
+  } else if (type === ResponseMessage.WITHDRAWAL_SUCCESS) {
+    return [HttpStatus.NO_CONTENT, name + type];
   }
 
   return [HttpStatus.OK, name + type];

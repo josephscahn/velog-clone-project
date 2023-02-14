@@ -9,6 +9,7 @@ import { deleteImageFile, getImageURL } from 'src/lib/multerOptions';
 import { FollowRepository } from 'src/repository/follow.repository';
 import { SocialInfoRepository } from 'src/repository/social-info.repository';
 import { UserRepository } from 'src/repository/user.repository';
+import { UploadService } from 'src/upload/upload.service';
 import { Connection } from 'typeorm';
 
 @Injectable()
@@ -16,6 +17,7 @@ export class UserService {
   private userRepository: UserRepository;
   private socialInfoRepository: SocialInfoRepository;
   private followRepository: FollowRepository;
+  private uploadService: UploadService;
   constructor(private readonly connection: Connection) {
     this.userRepository = this.connection.getCustomRepository(UserRepository);
     this.socialInfoRepository = this.connection.getCustomRepository(SocialInfoRepository);
@@ -43,10 +45,11 @@ export class UserService {
     return await this.socialInfoRepository.getSocialInfoByUserId(id, keys);
   }
 
-  async updateProfileImage(id: number, file_name: string, files: File[]) {
+  async updateProfileImage(id: number, file_name: string, new_image: string) {
     if (file_name) {
       deleteImageFile(file_name);
     }
+    await this.userRepository.updateProfileImage(id, new_image);
 
     return this.userRepository.getUserByUserId(id, ['profile_image']);
   }
@@ -59,16 +62,16 @@ export class UserService {
 
   async follow(followerId: number, followeeId: number) {
     if (followerId === followeeId) {
-      throw new BadRequestException('Cannot follow yourself');
+      throw new BadRequestException('팔로우 실패했습니다.');
     }
     const user = await this.userRepository.findByLogin(followeeId);
     if (!user) {
-      throw new NotFoundException('Not Found UserId');
+      throw new NotFoundException('존재하지 않는 유저입니다.');
     }
 
     const data = await this.followRepository.checkFollow(followerId, followeeId);
     if (data) {
-      throw new ConflictException('Already follow');
+      throw new ConflictException('이미 팔로우한 유저입니다.');
     }
     await this.followRepository.follow(followerId, followeeId);
     if (await this.followRepository.findOne({ follower: followerId, followee: followeeId })) {
@@ -80,15 +83,15 @@ export class UserService {
 
   async unfollow(followerId: number, followeeId: number) {
     if (followerId === followeeId) {
-      throw new BadRequestException('Cannot follow yourself');
+      throw new BadRequestException('팔로우 취소 실패했습니다.');
     }
     const user = await this.userRepository.findByLogin(followeeId);
     if (!user) {
-      throw new NotFoundException('Not Found UserId');
+      throw new NotFoundException('존재하지 않는 유저입니다.');
     }
     const data = await this.followRepository.checkFollow(followerId, followeeId);
     if (!data) {
-      throw new ConflictException('Already unfollow');
+      throw new ConflictException('팔로우하지 않은 유저입니다.');
     }
 
     await this.followRepository.unfollow(followerId, followeeId);
@@ -120,6 +123,11 @@ export class UserService {
   }
 
   async withdrawal(user_id: number) {
+    const exist = await this.userRepository.findOne({ id: user_id });
+    if (!exist) {
+      throw new NotFoundException('존재하지않는 유저입니다.');
+    }
+
     await this.userRepository.withdrawal(user_id);
   }
 }

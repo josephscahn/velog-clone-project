@@ -15,7 +15,10 @@ import {
   Get,
   HttpStatus,
   HttpException,
+  ForbiddenException,
 } from '@nestjs/common';
+import { SetResponse } from 'src/common/response';
+import { ResponseMessage } from 'src/common/response-message.model';
 import { GetUser } from 'src/custom-decorator/get-user.decorator';
 import { CreateSocialUserDto } from 'src/dto/user/create-social-user.dto';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
@@ -37,7 +40,8 @@ export class AuthController {
       throw new ConflictException('이미 가입된 이메일입니다.');
     } else {
       const code = await this.authService.sendEmail(email);
-      return { message: 'Send Email', signup_code: code };
+      const response = SetResponse('', ResponseMessage.AVAILABLE_EMAIL);
+      return { statusCode: response[0], message: response[1], code: code };
     }
   }
 
@@ -48,7 +52,8 @@ export class AuthController {
     if (user) {
       throw new ConflictException('이미 가입된 로그인 아이디입니다.');
     } else {
-      return { message: '사용 가능한 로그인 아이디입니다' };
+      const response = SetResponse('', ResponseMessage.AVAILABLE_ID);
+      return { statusCode: response[0], message: response[1] };
     }
   }
 
@@ -94,12 +99,12 @@ export class AuthController {
           result = await this.authService.signupWithSocial(createFacebookUserDto);
           break;
         default:
-          throw new BadRequestException(
-            'Type must to be `email` or `github` or `google` or `facebook`',
-          );
+          throw new BadRequestException('Type 형식을 지켜주세요.');
       }
+      const response = SetResponse(type, ResponseMessage.SIGNUP_SUCCESS);
       return {
-        message: 'signup & login success',
+        statusCode: response[0],
+        message: response[1],
         token: result['token'],
         id: result['id'],
         profile_image: result['profile_image'],
@@ -119,8 +124,10 @@ export class AuthController {
   @HttpCode(201)
   async login(@GetUser() user: User) {
     const data = await this.authService.login(user);
+    const response = SetResponse(data.id + '번 유저', ResponseMessage.LOGIN_SUCCESS);
     return {
-      message: 'login success',
+      statusCode: response[0],
+      message: response[1],
       token: data.token,
       id: data.id,
       profile_image: data.profile_image,
@@ -171,12 +178,21 @@ export class AuthController {
       })
       .catch(err => {
         console.log(err);
-        throw new HttpException('google oauth user_info err', 500);
+        throw new HttpException('구글 로그인 서버 오류입니다.', 500);
       });
 
     const data = await this.authService.googleLogin(user_info);
-
-    return data;
+    let response: (string | HttpStatus)[];
+    switch (data.message) {
+      case '구글 로그인에 성공했습니다.':
+        response = SetResponse('', ResponseMessage.LOGIN_SUCCESS);
+        return { statusCode: response[0], message: response[1], token: data.token };
+      case '회원가입 먼저 진행해야합니다':
+        response = SetResponse('', ResponseMessage.SIGNUP_NEEDED);
+        return { statusCode: response[0], message: response[1], user: data.user };
+      case '구글에 등록되지않은 유저입니다.':
+        throw new ForbiddenException(data.message);
+    }
   }
 
   @Get('/facebook/callback')

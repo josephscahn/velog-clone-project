@@ -22,6 +22,8 @@ import { SocialInfoDto, UpdateUserDto } from 'src/dto/user/update-user.dto';
 import { User } from 'src/entity/user.entity';
 import { multerOptions } from 'src/lib/multerOptions';
 import { UserService } from './user.service';
+import { SetResponse } from 'src/common/response';
+import { ResponseMessage } from 'src/common/response-message.model';
 
 @Controller('users')
 export class UserController {
@@ -36,7 +38,6 @@ export class UserController {
     @Query('type') type: string,
     @GetUser() user: User,
   ) {
-    // type: [title, name, social_info]
     const id = user.id;
     let data: any = '';
     let updateData: object = {};
@@ -57,7 +58,7 @@ export class UserController {
 
       case 'title':
         if (!updateUserDto.title) {
-          throw new BadRequestException('title must be entered');
+          throw new BadRequestException('title이 입력되어야합니다.');
         }
         updateData = { title: updateUserDto.title };
         data = await this.userService.updateUser(id, updateData);
@@ -65,7 +66,7 @@ export class UserController {
 
       case 'name':
         if (!updateUserDto.name) {
-          throw new BadRequestException('name must be entered');
+          throw new BadRequestException('name이 입력되어야합니다.');
         }
         updateData = {
           name: updateUserDto.name,
@@ -76,7 +77,7 @@ export class UserController {
 
       case 'alert':
         if (updateUserDto.comment_alert === undefined || updateUserDto.update_alert === undefined) {
-          throw new BadRequestException('alert must be entered');
+          throw new BadRequestException('alert가 입력되어야합니다.');
         }
         updateData = {
           comment_alert: updateUserDto.comment_alert,
@@ -85,8 +86,8 @@ export class UserController {
         data = await this.userService.updateUser(id, updateData);
         break;
     }
-
-    return { message: 'update user success', data: data[0] };
+    const response = SetResponse('유저 정보', ResponseMessage.UPDATE_SUCCESS);
+    return { statusCode: response[0], message: response[1], data: data[0] };
   }
 
   @Post('/profile_image')
@@ -100,9 +101,11 @@ export class UserController {
     @GetUser() user: User,
   ) {
     const id = user.id;
-    const data = await this.userService.updateProfileImage(id, image_url, files);
+    const data = await this.userService.updateProfileImage(id, image_url, files[0]['filename']);
+    const response = SetResponse(id + '번 유저의 프로필 이미지', ResponseMessage.UPDATE_SUCCESS);
     return {
-      message: 'update profile image success',
+      statusCode: response[0],
+      message: response[1],
       profile_image: data[0].profile_image,
     };
   }
@@ -111,10 +114,10 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async deleteProfileImage(@Query('image_url') image_url: string, @GetUser() user: User) {
     await this.userService.deleteProfileImage(user.id, image_url);
-
+    const response = SetResponse('프로필 이미지', ResponseMessage.DELETE_SUCCESS);
     return {
-      statusCode: 200,
-      message: 'profile_image delete success',
+      statusCode: response[0],
+      message: response[1],
     };
   }
 
@@ -130,10 +133,9 @@ export class UserController {
   @HttpCode(201)
   async follow(@GetUser() user: User, @Body('followee_id', ParseIntPipe) followeeId: number) {
     const followerId = user.id;
-    console.log('user', user);
-    console.log('followee_id', followeeId);
     const data = await this.userService.follow(followerId, followeeId);
-    return { message: `follow success`, is_follower: data };
+    const response = SetResponse(followeeId.toString() + '번 유저', ResponseMessage.FOLLOW_SUCCESS);
+    return { statusCode: response[0], message: response[1], is_follower: data };
   }
 
   @Delete('/follow')
@@ -143,7 +145,11 @@ export class UserController {
   async unfollow(@GetUser() user: User, @Body('followee_id', ParseIntPipe) followeeId: number) {
     const followerId = user.id;
     const data = await this.userService.unfollow(followerId, followeeId);
-    return { message: `unfollow success`, is_follower: data };
+    const response = SetResponse(
+      followeeId.toString() + '번 유저',
+      ResponseMessage.UNFOLLOW_SUCCESS,
+    );
+    return { statusCode: response[0], message: response[1], is_follower: data };
   }
 
   @Get('/follow')
@@ -152,9 +158,9 @@ export class UserController {
   @HttpCode(200)
   async getMyFollowee(@GetUser() user: User) {
     const id = user.id;
-    let follow = await this.userService.getMyFollowee(id);
-    follow = follow[0];
-    return { follow };
+    const follow = (await this.userService.getMyFollowee(id))[0];
+    const response = SetResponse('팔로워', ResponseMessage.READ_SUCCESS);
+    return { statusCode: response[0], message: response[1], followee: follow };
   }
 
   @Get()
@@ -163,12 +169,18 @@ export class UserController {
   async getMe(@GetUser() user: User) {
     const id = user.id;
     const data = await this.userService.getMe(id);
-    return { message: 'getMe success', user: data };
+    const response = SetResponse(id.toString() + '번 유저', ResponseMessage.READ_SUCCESS);
+    return { statusCode: response[0], message: response[1], user: data };
   }
 
   @Delete()
   @UseGuards(JwtAuthGuard)
   async withdrawal(@GetUser() user: User) {
     await this.userService.withdrawal(user.id);
+    const response = SetResponse(
+      user.id.toString() + '번 유저 ',
+      ResponseMessage.WITHDRAWAL_SUCCESS,
+    );
+    return { statusCode: response[0], message: response[1] };
   }
 }

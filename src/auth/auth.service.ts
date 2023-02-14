@@ -88,7 +88,7 @@ export class AuthService {
 
   async googleLogin(user: object) {
     if (!user) {
-      return new ForbiddenException(403, 'No user from google');
+      return { message: '구글에 등록되지않은 유저입니다.' };
     }
     const data = await this.userRepository.checkEmail(user['email']);
     if (!data) {
@@ -100,7 +100,7 @@ export class AuthService {
 
     const token = await this.login(data);
     return {
-      message: 'Google login success',
+      message: '구글 로그인에 성공했습니다.',
       token: token,
     };
   }

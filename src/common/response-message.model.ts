@@ -1,6 +1,7 @@
 export enum ResponseMessage {
   SEND_EMAIL_SUCCESS = '인증번호 이메일 전송에 선공했습니다.',
   AVAILABLE_ID = '사용 가능한 로그인 아이디 입니다.',
+  AVAILABLE_EMAIL = '사용 가능한 이메일입니다.',
   LOGIN_SUCCESS = ' 로그인에 성공했습니다.',
   SIGNUP_SUCCESS = ' 회원가입에 성공했습니다.',
   FOLLOW_SUCCESS = '님에게 팔로우 성공했습니다.',
@@ -13,4 +14,6 @@ export enum ResponseMessage {
   DELETE_SUCCESS = ' 삭제에 성공했습니다.',
   ADD_SUCCESS1 = ' 추가에 성공했습니다.',
   ADD_SUCCESS2 = ' 등록에 성공했습니다.',
+  WITHDRAWAL_SUCCESS = '회원 탈퇴에 성공했습니다.',
+  SIGNUP_NEEDED = '회원가입이 필요합니다.',
 }
