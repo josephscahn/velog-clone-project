@@ -35,7 +35,7 @@ export class UserController {
   @HttpCode(201)
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
-    @Query('type') type: string,
+    @Query('type') type,
     @GetUser() user: User,
   ) {
     const id = user.id;
@@ -102,11 +102,12 @@ export class UserController {
   ) {
     const id = user.id;
     const data = await this.userService.updateProfileImage(id, image_url, files[0]['filename']);
+
     const response = SetResponse(id + '번 유저의 프로필 이미지', ResponseMessage.UPDATE_SUCCESS);
     return {
       statusCode: response[0],
       message: response[1],
-      profile_image: data[0].profile_image,
+      profile_image: data.profile_image,
     };
   }
 

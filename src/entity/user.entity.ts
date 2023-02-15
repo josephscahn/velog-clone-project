@@ -1,5 +1,7 @@
 import { BaseEntity, BeforeInsert, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
+import { BadRequestException } from '@nestjs/common';
+import { ResponseMessage } from 'src/common/response-message.model';
 
 @Entity({ name: 'user' })
 @Unique(['email'])
@@ -43,7 +45,10 @@ export class User extends BaseEntity {
 
   @BeforeInsert()
   hashPassword() {
-    if (this.password) {
+    if (this.provider === 'email') {
+      if (!this.password) {
+        throw new BadRequestException(ResponseMessage.BAD_REQUEST);
+      }
       this.password = bcryptjs.hashSync(this.password, 10);
     }
   }

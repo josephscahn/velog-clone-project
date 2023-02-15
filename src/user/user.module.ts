@@ -12,13 +12,20 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserRepository, SocialInfoRepository, FollowRepository])],
+  imports: [
+    TypeOrmModule.forFeature([
+      UserRepository,
+      SocialInfoRepository,
+      FollowRepository,
+      UserRepository,
+      SocialInfoRepository,
+      FollowRepository,
+    ]),
+  ],
+  exports: [TypeOrmModule, UserService],
   controllers: [UserController],
   providers: [
     UserService,
-    UserRepository,
-    SocialInfoRepository,
-    FollowRepository,
     IsEmailOrNullConstraint,
     IsUrlOrNullConstraint,
     IsBooleanOrNullConstraint,

@@ -65,7 +65,7 @@ export class AuthController {
       let result: object = {};
       switch (type) {
         case 'email':
-          result = await this.authService.signupWithEmail(createUserDto);
+          result = await this.authService.signupWithEmail(createUserDto, type);
           break;
         case 'github':
           const createGithubUserDto: CreateSocialUserDto = {
@@ -112,6 +112,8 @@ export class AuthController {
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') {
         throw new ConflictException('이메일 또는 로그인 아이디가 중복 되었습니다');
+      } else if (err.message === ResponseMessage.BAD_REQUEST) {
+        throw new BadRequestException(ResponseMessage.BAD_REQUEST);
       } else {
         console.log(err);
         throw new InternalServerErrorException();

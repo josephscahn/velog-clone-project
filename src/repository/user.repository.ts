@@ -31,7 +31,7 @@ export class UserRepository extends Repository<User> {
     return profile_image;
   }
 
-  async signupWithEmail(createUserDto: CreateUserDto) {
+  async signupWithEmail(createUserDto: CreateUserDto, type: string) {
     const { email, name, about_me, login_id, password } = createUserDto;
     const user = this.create({
       email,
@@ -40,6 +40,7 @@ export class UserRepository extends Repository<User> {
       login_id,
       about_me,
       title: login_id + '.log',
+      provider: type,
     });
     return await this.save(user);
   }

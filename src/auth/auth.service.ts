@@ -45,8 +45,8 @@ export class AuthService {
     return await this.userRepository.checkLoginId(login_id);
   }
 
-  async signupWithEmail(createUserDto: CreateUserDto) {
-    const user = await this.userRepository.signupWithEmail(createUserDto);
+  async signupWithEmail(createUserDto: CreateUserDto, type: string) {
+    const user = await this.userRepository.signupWithEmail(createUserDto, type);
     return await this.login(user);
   }
 
@@ -62,7 +62,7 @@ export class AuthService {
     const user = await this.userRepository.checkLoginId(login_id);
 
     if (!user) {
-      throw new ForbiddenException('로그인 아이디를 확인 해주세요');
+      throw new ForbiddenException('로그인 아이디를 확인 해주세요.');
     }
 
     if (bcryptjs.compareSync(password, user.password)) {

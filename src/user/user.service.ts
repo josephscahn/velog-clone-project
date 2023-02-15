@@ -5,24 +5,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SocialInfoDto } from 'src/dto/user/update-user.dto';
-import { deleteImageFile, getImageURL } from 'src/lib/multerOptions';
+import { deleteImageFile } from 'src/lib/multerOptions';
 import { FollowRepository } from 'src/repository/follow.repository';
 import { SocialInfoRepository } from 'src/repository/social-info.repository';
 import { UserRepository } from 'src/repository/user.repository';
-import { UploadService } from 'src/upload/upload.service';
 import { Connection } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  private userRepository: UserRepository;
-  private socialInfoRepository: SocialInfoRepository;
-  private followRepository: FollowRepository;
-  private uploadService: UploadService;
-  constructor(private readonly connection: Connection) {
-    this.userRepository = this.connection.getCustomRepository(UserRepository);
-    this.socialInfoRepository = this.connection.getCustomRepository(SocialInfoRepository);
-    this.followRepository = this.connection.getCustomRepository(FollowRepository);
-  }
+  constructor(
+    private userRepository: UserRepository,
+    private socialInfoRepository: SocialInfoRepository,
+    private followRepository: FollowRepository,
+  ) {}
 
   async findOne(login_id: string) {
     return this.userRepository.findByLogin(login_id);
@@ -42,7 +37,9 @@ export class UserService {
 
     const keys: string[] = Object.keys(socialInfoDto);
 
-    return await this.socialInfoRepository.getSocialInfoByUserId(id, keys);
+    const data = await this.socialInfoRepository.getSocialInfoByUserId(id, keys);
+
+    return data;
   }
 
   async updateProfileImage(id: number, file_name: string, new_image: string) {
@@ -51,7 +48,7 @@ export class UserService {
     }
     await this.userRepository.updateProfileImage(id, new_image);
 
-    return this.userRepository.getUserByUserId(id, ['profile_image']);
+    return this.userRepository.getUserProfileImage(id);
   }
 
   async deleteProfileImage(id: number, file_name: string) {

@@ -16,4 +16,5 @@ export enum ResponseMessage {
   ADD_SUCCESS2 = ' 등록에 성공했습니다.',
   WITHDRAWAL_SUCCESS = '회원 탈퇴에 성공했습니다.',
   SIGNUP_NEEDED = '회원가입이 필요합니다.',
+  BAD_REQUEST = '필요한 정보가 정확하지 않습니다.',
 }
