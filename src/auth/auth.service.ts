@@ -142,4 +142,9 @@ export class AuthService {
       token: token,
     };
   }
+
+  async tokenValidateUser(payload) {
+    const user = await this.userRepository.findByLogin(payload.user.sub);
+    return user;
+  }
 }
