@@ -41,7 +41,7 @@ export class AuthController {
     } else {
       const code = await this.authService.sendEmail(email);
       const response = SetResponse('', ResponseMessage.AVAILABLE_EMAIL);
-      return { statusCode: response[0], message: response[1], code: code };
+      return { statusCode: response[0], message: response[1], signup_code: code };
     }
   }
 
