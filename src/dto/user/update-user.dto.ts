@@ -1,5 +1,5 @@
 import { PickType } from '@nestjs/mapped-types';
-import { Allow, IsEnum, Length } from 'class-validator';
+import { Allow } from 'class-validator';
 import { IsBooleanOrNull, IsEmailOrNull, IsUrlOrNull } from 'src/validations/user.validation';
 
 /**

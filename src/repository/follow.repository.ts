@@ -1,5 +1,4 @@
 import { Follow } from 'src/entity/follow.entity';
-import { User } from 'src/entity/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Follow)

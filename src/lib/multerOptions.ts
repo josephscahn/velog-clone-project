@@ -6,7 +6,7 @@ import { diskStorage } from 'multer';
 import uuidRandom from './uuidRandom';
 
 export const multerOptions = {
-  fileFilter: (request, file, callback) => {
+  fileFilter: (_request, file, callback) => {
     if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
       callback(null, true);
     } else {
@@ -17,7 +17,7 @@ export const multerOptions = {
   },
 
   storage: diskStorage({
-    destination: (request, file, callback) => {
+    destination: (_request, _file, callback) => {
       const uploadPath: string = getUploadPath();
 
       callback(null, uploadPath);

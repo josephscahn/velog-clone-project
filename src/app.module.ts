@@ -16,7 +16,6 @@ import { APP_FILTER } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AboutModule } from './about/about.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
-import { HealthController } from './health/health.controller';
 import { HealthModule } from './health/health.module';
 
 @Module({
@@ -39,7 +38,6 @@ import { HealthModule } from './health/health.module';
     UploadModule,
     AboutModule,
     HealthModule,
-    HealthModule,
   ],
   providers: [
     {
@@ -47,7 +45,6 @@ import { HealthModule } from './health/health.module';
       useClass: GlobalExceptionFilter,
     },
   ],
-  controllers: [HealthController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -8,8 +8,8 @@ import { Post } from './post.entity';
     post.user_id,
     JSON_ARRAYAGG(
       JSON_OBJECT(
-         'tag_id', tag.id,
-         'tag_name', tag.name
+        'tag_id', tag.id,
+        'tag_name', tag.name
       )
     ) AS tags
     FROM post
@@ -19,7 +19,7 @@ import { Post } from './post.entity';
     `,
 })
 export class TagsView {
-  @ManyToOne((type) => Post)
+  @ManyToOne(type => Post)
   @JoinColumn({ name: 'post_id' })
   post: number;
 

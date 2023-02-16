@@ -9,7 +9,6 @@ import { deleteImageFile } from 'src/lib/multerOptions';
 import { FollowRepository } from 'src/repository/follow.repository';
 import { SocialInfoRepository } from 'src/repository/social-info.repository';
 import { UserRepository } from 'src/repository/user.repository';
-import { Connection } from 'typeorm';
 
 @Injectable()
 export class UserService {

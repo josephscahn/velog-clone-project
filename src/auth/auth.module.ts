@@ -10,8 +10,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from 'src/user/user.module';
 import { LocalStrategy } from './strategies/local.strategy';
-import { GithubStrategy } from './strategies/github.strategy';
-import { FacebookStrategy } from './strategies/facebook.strategy';
 import { HttpModule } from '@nestjs/axios';
 import { UploadService } from 'src/upload/upload.service';
 
@@ -37,15 +35,7 @@ import { UploadService } from 'src/upload/upload.service';
     HttpModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    UserService,
-    LocalStrategy,
-    JwtStrategy,
-    GithubStrategy,
-    FacebookStrategy,
-    UploadService,
-  ],
+  providers: [AuthService, UserService, LocalStrategy, JwtStrategy, UploadService],
   exports: [AuthService],
 })
 export class AuthModule {}

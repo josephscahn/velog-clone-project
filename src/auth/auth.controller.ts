@@ -11,7 +11,6 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
-  Request,
   Get,
   HttpStatus,
   HttpException,
@@ -24,8 +23,6 @@ import { CreateSocialUserDto } from 'src/dto/user/create-social-user.dto';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
 import { User } from 'src/entity/user.entity';
 import { AuthService } from './auth.service';
-import { FacebookAuthGuard } from './guards/facbook-oauth.guard';
-import { GithubAuthGuard } from './guards/github-oauth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
@@ -136,23 +133,8 @@ export class AuthController {
     };
   }
 
-  @Get('/github/callback')
-  @UseGuards(GithubAuthGuard)
-  async githubAuthRedirect(@Request() req) {
-    const data = await this.authService.githubLogin(req.user);
-    return data;
-  }
-
-  @Get('/github')
-  @UseGuards(GithubAuthGuard)
-  async githubAuth(@Request() req) {
-    return HttpStatus.OK;
-  }
-
   @Get('/google/callback')
-  async googleAuthRedirect(@Query() query, @Request() req) {
-    const code = query.code;
-
+  async googleAuthRedirect(@Query('code') code: string) {
     const url = `https://oauth2.googleapis.com/token?code=${code}&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_CLIENT_SECRET}&redirect_uri=${process.env.GOOGLE_REDIRECT_URI}&grant_type=${process.env.GOOGLE_GRANT_TYPE}`;
 
     const access_token = await this.http.axiosRef
@@ -195,18 +177,5 @@ export class AuthController {
       case '구글에 등록되지않은 유저입니다.':
         throw new ForbiddenException(data.message);
     }
-  }
-
-  @Get('/facebook/callback')
-  @UseGuards(FacebookAuthGuard)
-  async facebookAuthRedirect(@Request() req) {
-    const data = await this.authService.facebookLogin(req.user);
-    return data;
-  }
-
-  @Get('/facebook')
-  @UseGuards(FacebookAuthGuard)
-  async facebookAuth(@Request() req) {
-    return HttpStatus.OK;
   }
 }

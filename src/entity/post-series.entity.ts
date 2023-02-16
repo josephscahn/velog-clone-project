@@ -1,11 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-  Column,
-  CreateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { Post } from './post.entity';
 import { Series } from './series.entity';
 
@@ -14,11 +7,11 @@ export class PostSeries {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Series, { onDelete: 'CASCADE' })
+  @ManyToOne(type => Series, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'series_id' })
   series: number;
 
-  @ManyToOne((type) => Post, { onDelete: 'CASCADE' })
+  @ManyToOne(type => Post, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post: number;
 

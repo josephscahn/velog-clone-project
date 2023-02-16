@@ -10,7 +10,6 @@ import {
   OneToMany,
   JoinTable,
 } from 'typeorm';
-import { Comments } from './comment.entity';
 import { PostTag } from './post-tag.entity';
 import { User } from './user.entity';
 import { TagsView } from './view-tags.entity';
