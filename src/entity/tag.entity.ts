@@ -9,6 +9,6 @@ export class Tag extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 }

@@ -38,10 +38,10 @@ export class Post extends BaseEntity {
   @Column({ default: 0 })
   likes: number;
 
-  @Column()
+  @Column({ nullable: true })
   post_url: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @CreateDateColumn()

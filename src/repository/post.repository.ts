@@ -105,7 +105,7 @@ export class PostRepository extends Repository<Post> {
     await post.execute();
   }
 
-  async selectPostList(user_id: number, is_owner: boolean, pagination: PaginationDto) {
+  async selectPostList(user_id: number, login_user_id: number, pagination: PaginationDto) {
     const { tag_id, offset, limit } = pagination;
     let posts = this.createQueryBuilder('post')
       .leftJoin('post.user', 'user')
@@ -124,13 +124,14 @@ export class PostRepository extends Repository<Post> {
         'COUNT(comments.id) AS post_comment_count',
         'post.likes',
         'post.status',
+        'IF(post.user_id = :login_user_id, 1, 0) AS is_owner',
       ])
       .setParameter('server_url', process.env.IMAGE_URL)
-      .setParameter('is_owner', is_owner)
+      .setParameter('login_user_id', login_user_id)
       .groupBy('post.id')
       .orderBy('post.create_at', 'DESC');
 
-    if (is_owner) {
+    if (user_id === login_user_id) {
       posts.andWhere("post.status REGEXP '1|2'");
     } else {
       posts.andWhere('post.status = 1');
