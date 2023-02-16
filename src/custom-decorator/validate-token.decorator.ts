@@ -3,8 +3,8 @@ import * as jwt from 'jsonwebtoken';
 import { User } from 'src/entity/user.entity';
 
 export const ValidateToken = createParamDecorator((_data, ctx: ExecutionContext): User | null => {
-  const rawHeaders = ctx.switchToHttp().getRequest()['rawHeaders'];
-  const auth_index = rawHeaders.indexOf('Authorization');
+  const rawHeaders: Array<string> = ctx.switchToHttp().getRequest()['rawHeaders'];
+  const auth_index = rawHeaders.findIndex(el => el === 'authorization' || el === 'Authorization');
 
   if (auth_index != -1) {
     const token = rawHeaders[auth_index + 1].replace('Bearer ', '');
