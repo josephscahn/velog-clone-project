@@ -31,7 +31,8 @@ export class SearchController {
     return {
       statusCode: response[0],
       message: response[1],
-      posts: data,
+      searchPosts: data['searchPosts'],
+      postCount: data['postCount'],
     };
   }
 }
