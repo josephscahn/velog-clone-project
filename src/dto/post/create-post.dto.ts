@@ -28,9 +28,5 @@ export class CreatePostDto {
 
   @IsOptional()
   @IsString()
-  post_url: string;
-
-  @IsOptional()
-  @IsString()
   description: string;
 }

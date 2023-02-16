@@ -14,7 +14,6 @@ export class PostRepository extends Repository<Post> {
       content: data.content,
       status: data.status,
       thumbnail: data.thumbnail,
-      post_url: data.post_url,
       description: data.description,
       user: user,
     });
@@ -44,7 +43,6 @@ export class PostRepository extends Repository<Post> {
         'post.likes AS likes',
         'IF(post.user_id = :userId, 1, 0) AS is_writer',
         'IF(INSTR(tags.tags,\'"tag_id": null\'), null, tags.tags) AS tags',
-        'post.post_url as post_url',
         'post.description as description',
       ])
       .setParameter('server_url', process.env.IMAGE_URL)
@@ -82,7 +80,6 @@ export class PostRepository extends Repository<Post> {
         content: data.content,
         status: data.status,
         thumbnail: data.thumbnail,
-        post_url: data.post_url,
         description: data.description,
       })
       .where(`id = :post_id AND user_id = :user_id`, {

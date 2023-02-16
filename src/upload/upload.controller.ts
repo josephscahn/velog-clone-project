@@ -19,7 +19,7 @@ export class UploadController {
     return {
       statusCode: response[0],
       message: response[1],
-      imageUrl: result,
+      imageUrl: result[0],
     };
   }
 
