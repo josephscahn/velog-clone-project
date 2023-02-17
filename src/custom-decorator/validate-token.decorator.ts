@@ -12,10 +12,9 @@ export const ValidateToken = createParamDecorator((_data, ctx: ExecutionContext)
     if (token !== 'null' && token !== 'Host') {
       let user = jwt.verify(token, process.env.SECRET_KEY)['user'];
       user = {
-        id: user['sub'],
-        login_id: user['login_id'],
-        name: user['name'],
+        id: user.id,
       };
+
       return user;
     }
   }

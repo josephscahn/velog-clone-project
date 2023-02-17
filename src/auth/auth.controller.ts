@@ -123,6 +123,7 @@ export class AuthController {
   @HttpCode(201)
   async login(@GetUser() user: User) {
     const data = await this.authService.login(user);
+
     const response = SetResponse(data.id + '번 유저', ResponseMessage.LOGIN_SUCCESS);
     return {
       statusCode: response[0],

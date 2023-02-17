@@ -3,7 +3,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { CreateUserDto } from 'src/dto/user/create-user.dto';
 import { UserRepository } from 'src/repository/user.repository';
 import * as bcryptjs from 'bcryptjs';
-import { IPayload } from './context/types';
 import { CreateSocialUserDto } from 'src/dto/user/create-social-user.dto';
 import * as jwt from 'jsonwebtoken';
 import { UploadService } from 'src/upload/upload.service';
@@ -73,10 +72,8 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload: IPayload = {
-      sub: user.id,
-      login_id: user.login_id,
-      name: user.name,
+    const payload = {
+      id: user.id,
     };
     const profile_image = await this.userRepository.getUserProfileImage(user.id);
     return {
@@ -144,7 +141,7 @@ export class AuthService {
   }
 
   async tokenValidateUser(payload) {
-    const user = await this.userRepository.findByLogin(payload.user.sub);
+    const user = await this.userRepository.findByLogin(payload.user.id);
     return user;
   }
 }
